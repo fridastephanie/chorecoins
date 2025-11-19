@@ -30,28 +30,50 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-
-            if (jwtUtil.validateToken(token)) {
-                String email = jwtUtil.getEmailFromToken(token);
-                String role = jwtUtil.getRoleFromToken(token); // ex: ROLE_PARENT
-
-                User user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                List.of(new SimpleGrantedAuthority(role))
-                        );
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
+        String token = extractToken(request);
+        if (token != null) {
+            User user = getUserFromToken(token);
+            String role = jwtUtil.getRoleFromToken(token);
+            setAuthentication(user, role);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * HELPER: Extract Bearer token from Authorization header
+     */
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
+
+    /**
+     * HELPER: Validate token and fetch the corresponding user
+     */
+    private User getUserFromToken(String token) {
+        if (!jwtUtil.validateToken(token)) {
+            throw new RuntimeException("Invalid JWT token");
+        }
+
+        String email = jwtUtil.getEmailFromToken(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    /**
+     * HELPER: Set authentication in Spring Security context
+     */
+    private void setAuthentication(User user, String role) {
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        List.of(new SimpleGrantedAuthority(role))
+                );
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }

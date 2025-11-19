@@ -48,6 +48,35 @@ public class FamilyService {
     }
 
     /**
+     * Remove an existing user from a family.
+     */
+    public FamilyDto removeMember(Long familyId, Long userId) {
+        Family family = getFamilyOrThrow(familyId);
+        User user = getUserOrThrow(userId);
+        if (!family.getMembers().remove(user)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of this family");
+        }
+        return saveAndMap(family);
+    }
+
+    /**
+     * Update the name of an existing family.
+     */
+    public FamilyDto updateFamilyName(Long familyId, String newName) {
+        Family family = getFamilyOrThrow(familyId);
+        family.setFamilyName(newName);
+        return saveAndMap(family);
+    }
+
+    /**
+     * Delete a family by its ID.
+     */
+    public void deleteFamily(Long familyId) {
+        Family family = getFamilyOrThrow(familyId);
+        familyRepository.delete(family);
+    }
+
+    /**
      * Get a family by ID, including all members.
      */
     public FamilyDto getFamily(Long familyId) {

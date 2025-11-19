@@ -2,6 +2,7 @@ package se.gritacademy.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,7 +34,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/api/families/**").hasRole("PARENT")
+
+                        // Parent-only (write operations)
+                        .requestMatchers(HttpMethod.POST, "/api/families/**").hasRole("PARENT")
+                        .requestMatchers(HttpMethod.PUT, "/api/families/**").hasRole("PARENT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/families/**").hasRole("PARENT")
+
+                        // Child AND Parent can view a family
+                        .requestMatchers(HttpMethod.GET, "/api/families/**").hasAnyRole("PARENT", "CHILD")
+
                         .anyRequest().authenticated()
                 );
 

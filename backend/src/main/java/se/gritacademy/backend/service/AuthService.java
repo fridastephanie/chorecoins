@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import se.gritacademy.backend.config.JwtUtil;
+import se.gritacademy.backend.dto.auth.LoginResponseDto;
+import se.gritacademy.backend.dto.user.UserRole;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.repository.UserRepository;
 
@@ -12,20 +15,25 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
      * Logs in a user by email and password.
      * Throws 401 UNAUTHORIZED if credentials are invalid.
      */
-    public User login(String email, String rawPassword) {
+    public LoginResponseDto login(String email, String rawPassword) {
         User user = getUserOrThrow(email);
         verifyPassword(rawPassword, user.getPasswordHash());
-        return user;
+
+        UserRole userRole = UserRole.valueOf(user.getRole().replace("ROLE_", ""));
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        return new LoginResponseDto(token, userRole.name());
     }
 
     /**

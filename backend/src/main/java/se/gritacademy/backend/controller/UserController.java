@@ -3,7 +3,8 @@ package se.gritacademy.backend.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import se.gritacademy.backend.dto.user.RegisterRequestDto;
+import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
+import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.service.UserService;
 
 @RestController
@@ -18,7 +19,8 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
-        userService.registerUser(registerRequestDto);
+    public UserDto register(@Valid @RequestBody RegisterUserRequestDto registerUserRequestDto) {
+        return userService.registerUser(registerUserRequestDto);
     }
+
 }

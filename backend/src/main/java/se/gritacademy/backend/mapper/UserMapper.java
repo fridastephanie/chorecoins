@@ -1,14 +1,32 @@
 package se.gritacademy.backend.mapper;
 
 import org.springframework.stereotype.Component;
-import se.gritacademy.backend.dto.user.RegisterRequestDto;
+import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
+import se.gritacademy.backend.dto.user.UserDto;
+import se.gritacademy.backend.dto.user.UserRole;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
+import se.gritacademy.backend.entity.user.User;
 
 @Component
 public class UserMapper {
 
-    public Parent toParent(RegisterRequestDto dto, String encodedPassword) {
+    public UserDto toUserDto(User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(UserRole.valueOf(user.getRole().replace("ROLE_", "")));
+
+        if (user instanceof Child child) {
+            dto.setWeekBalance(child.getWeekBalance());
+            dto.setWeekCompletedChoresCount(child.getWeekCompletedChoresCount());
+        }
+
+        return dto;
+    }
+
+    public Parent toParent(RegisterUserRequestDto dto, String encodedPassword) {
         Parent parent = new Parent();
         parent.setFirstName(dto.getFirstName());
         parent.setEmail(dto.getEmail());
@@ -17,7 +35,7 @@ public class UserMapper {
         return parent;
     }
 
-    public Child toChild(RegisterRequestDto dto, String encodedPassword) {
+    public Child toChild(RegisterUserRequestDto dto, String encodedPassword) {
         Child child = new Child();
         child.setFirstName(dto.getFirstName());
         child.setEmail(dto.getEmail());

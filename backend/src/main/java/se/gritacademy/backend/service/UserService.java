@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import se.gritacademy.backend.dto.user.RegisterRequestDto;
+import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
+import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.mapper.UserMapper;
 import se.gritacademy.backend.repository.UserRepository;
@@ -26,18 +27,19 @@ public class UserService {
      * Registers a new user (Parent or Child) based on the provided request data.
      * Handles validation, password encoding, entity creation and persistence.
      */
-    public User registerUser(RegisterRequestDto request) {
+    public UserDto registerUser(RegisterUserRequestDto request) {
         checkEmailAvailable(request.getEmail());
         String encodedPassword = encodePassword(request.getPassword());
         User user = createUserEntity(request, encodedPassword);
-        return saveUser(user);
+        user = saveUser(user);
+        return userMapper.toUserDto(user);
     }
 
     /**
      * HELPER: Creates a User entity (Parent or Child) depending on request.userType.
      * Throws 400 BAD REQUEST if the user type is invalid.
      */
-    private User createUserEntity(RegisterRequestDto request, String encodedPassword) {
+    private User createUserEntity(RegisterUserRequestDto request, String encodedPassword) {
         return switch (request.getRole()) {
             case PARENT -> userMapper.toParent(request, encodedPassword);
             case CHILD -> userMapper.toChild(request, encodedPassword);

@@ -14,6 +14,6 @@ import java.math.BigDecimal;
 public class Child extends User {
 
     private BigDecimal weekBalance = BigDecimal.ZERO;
-    private int completedChoresCount = 0;
+    private int weekCompletedChoresCount = 0;
 
 }

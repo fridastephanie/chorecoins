@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import se.gritacademy.backend.dto.user.RegisterRequestDto;
-import se.gritacademy.backend.entity.user.Parent;
+import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.mapper.UserMapper;
 import se.gritacademy.backend.repository.UserRepository;
 
@@ -23,19 +23,40 @@ public class UserService {
     }
 
     /**
-     * Registers a new parent user.
-     * Throws 409 CONFLICT if email is already used.
+     * Registers a new user (Parent or Child) based on the provided request data.
+     * Handles validation, password encoding, entity creation and persistence.
      */
-    public Parent registerParent(RegisterRequestDto request) {
+    public User registerUser(RegisterRequestDto request) {
         checkEmailAvailable(request.getEmail());
         String encodedPassword = encodePassword(request.getPassword());
-        Parent parent = userMapper.toParent(request, encodedPassword);
-        return userRepository.save(parent);
+        User user = createUserEntity(request, encodedPassword);
+        return saveUser(user);
+    }
+
+    /**
+     * HELPER: Creates a User entity (Parent or Child) depending on request.userType.
+     * Throws 400 BAD REQUEST if the user type is invalid.
+     */
+    private User createUserEntity(RegisterRequestDto request, String encodedPassword) {
+        return switch (request.getRole()) {
+            case PARENT -> userMapper.toParent(request, encodedPassword);
+            case CHILD -> userMapper.toChild(request, encodedPassword);
+            default -> throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Invalid user type"
+            );
+        };
+    }
+
+    /**
+     * HELPER: Saves the given user entity to the database.
+     */
+    private User saveUser(User user) {
+        return userRepository.save(user);
     }
 
     /**
      * HELPER: Checks if the email is already registered.
-     * Throws 409 CONFLICT if the email is taken.
+     * Throws 409 CONFLICT if a user with the same email already exists.
      */
     private void checkEmailAvailable(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
@@ -44,7 +65,7 @@ public class UserService {
     }
 
     /**
-     * HELPER: Encodes the raw password using the PasswordEncoder.
+     * HELPER: Encodes a raw password using the configured PasswordEncoder.
      */
     private String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);

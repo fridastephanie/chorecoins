@@ -19,6 +19,6 @@ public class UserController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
-        userService.registerParent(registerRequestDto);
+        userService.registerUser(registerRequestDto);
     }
 }

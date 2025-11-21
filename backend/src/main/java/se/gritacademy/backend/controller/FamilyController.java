@@ -32,37 +32,42 @@ public class FamilyController {
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto addMember(@PathVariable Long familyId,
-                               @PathVariable Long userId) {
-        return familyService.addMember(familyId, userId);
+                               @PathVariable Long userId,
+                               @AuthenticationPrincipal Parent actor) {
+        return familyService.addMember(familyId, userId, actor);
     }
 
     @DeleteMapping("/{familyId}/members/{userId}")
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto removeMember(@PathVariable Long familyId,
-                                  @PathVariable Long userId) {
-        return familyService.removeMember(familyId, userId);
+                                  @PathVariable Long userId,
+                                  @AuthenticationPrincipal Parent actor) {
+        return familyService.removeMember(familyId, userId, actor);
     }
 
     @PatchMapping("/{familyId}")
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto updateFamilyName(@PathVariable Long familyId,
-                                      @RequestBody CreateFamilyRequestDto request) {
-        return familyService.updateFamilyName(familyId, request.getFamilyName());
+                                      @RequestBody CreateFamilyRequestDto request,
+                                      @AuthenticationPrincipal Parent actor) {
+        return familyService.updateFamilyName(familyId, request.getFamilyName(), actor);
     }
 
     @DeleteMapping("/{familyId}")
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFamily(@PathVariable Long familyId) {
-        familyService.deleteFamily(familyId);
+    public void deleteFamily(@PathVariable Long familyId,
+                             @AuthenticationPrincipal Parent actor) {
+        familyService.deleteFamily(familyId, actor);
     }
 
     @GetMapping("/{familyId}")
     @PreAuthorize("hasAnyRole('PARENT', 'CHILD')")
     @ResponseStatus(HttpStatus.OK)
-    public FamilyDto getFamily(@PathVariable Long familyId) {
-        return familyService.getFamily(familyId);
+    public FamilyDto getFamily(@PathVariable Long familyId,
+                               @AuthenticationPrincipal Parent actor) {
+        return familyService.getFamily(familyId, actor);
     }
 }

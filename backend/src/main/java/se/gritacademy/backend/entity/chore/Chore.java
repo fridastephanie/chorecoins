@@ -3,13 +3,15 @@ package se.gritacademy.backend.entity.chore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import se.gritacademy.backend.entity.family.Family;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -33,15 +35,21 @@ public class Chore {
 
     @ManyToOne
     @JoinColumn(name = "assigned_child_id")
-    private Child assignedChild;
+    private Child assignedTo;
 
     @ManyToOne
     @JoinColumn(name = "created_by_parent_id")
     private Parent createdBy;
 
+    @ManyToOne
+    @JoinColumn(name = "family_id", nullable = false)
+    private Family family;
+
+    private LocalDate dueDate;
+
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 
-    @OneToMany(mappedBy = "chore", cascade = CascadeType.ALL)
-    private List<ChoreImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "chore", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChoreSubmission> submissions = new HashSet<>();
 }

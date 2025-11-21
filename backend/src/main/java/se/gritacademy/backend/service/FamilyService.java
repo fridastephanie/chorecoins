@@ -40,8 +40,10 @@ public class FamilyService {
     /**
      * Add an existing user to a family.
      */
-    public FamilyDto addMember(Long familyId, Long userId) {
+    public FamilyDto addMember(Long familyId, Long userId, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
+        verifyFamilyMember(family, actor);
+
         User user = getUserOrThrow(userId);
         family.getMembers().add(user);
         return saveAndMap(family);
@@ -50,8 +52,10 @@ public class FamilyService {
     /**
      * Remove an existing user from a family.
      */
-    public FamilyDto removeMember(Long familyId, Long userId) {
+    public FamilyDto removeMember(Long familyId, Long userId, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
+        verifyFamilyMember(family, actor);
+
         User user = getUserOrThrow(userId);
         if (!family.getMembers().remove(user)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of this family");
@@ -62,8 +66,10 @@ public class FamilyService {
     /**
      * Update the name of an existing family.
      */
-    public FamilyDto updateFamilyName(Long familyId, String newName) {
+    public FamilyDto updateFamilyName(Long familyId, String newName, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
+        verifyFamilyMember(family, actor);
+
         family.setFamilyName(newName);
         return saveAndMap(family);
     }
@@ -71,16 +77,20 @@ public class FamilyService {
     /**
      * Delete a family by its ID.
      */
-    public void deleteFamily(Long familyId) {
+    public void deleteFamily(Long familyId, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
+        verifyFamilyMember(family, actor);
+
         familyRepository.delete(family);
     }
 
     /**
      * Get a family by ID, including all members.
      */
-    public FamilyDto getFamily(Long familyId) {
+    public FamilyDto getFamily(Long familyId, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
+        verifyFamilyMember(family, actor);
+
         return familyMapper.toFamilyDto(family);
     }
 
@@ -98,6 +108,18 @@ public class FamilyService {
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    /**
+     * Verify that a parent is a member of the family.
+     * Throws 403 if not a member.
+     */
+    private void verifyFamilyMember(Family family, Parent parent) {
+        boolean isMember = family.getMembers().stream()
+                .anyMatch(member -> member.getId().equals(parent.getId()));
+        if (!isMember) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Parent must belong to the family");
+        }
     }
 
     /**

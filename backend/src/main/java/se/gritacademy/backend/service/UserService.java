@@ -18,7 +18,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
@@ -45,23 +47,36 @@ public class UserService {
 
     /**
      * Updates a user's information (firstName, email, password).
+     * Only allowed if the actor is the same user.
      */
-    public UserDto updateUser(Long userId, UpdateUserRequestDto request) {
-        User user = getUserOrThrow(userId);
-        updateFirstName(user, request.getFirstName());
-        updateEmail(user, request.getEmail());
-        updatePassword(user, request.getPassword());
-        user = saveUser(user);
-        return userMapper.toUserDto(user);
+    public UserDto updateUser(Long userId, UpdateUserRequestDto request, User actor) {
+        User targetUser = getUserOrThrow(userId);
+        checkModifyPermission(actor, targetUser);
+        updateFirstName(targetUser, request.getFirstName());
+        updateEmail(targetUser, request.getEmail());
+        updatePassword(targetUser, request.getPassword());
+        targetUser = userRepository.save(targetUser);
+        return userMapper.toUserDto(targetUser);
     }
 
     /**
      * Deletes a user by ID and removes them from all associated families.
+     * Only allowed if the actor is the same user.
      */
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId, User actor) {
         User user = getUserOrThrow(userId);
+        checkModifyPermission(actor, user);
         removeUserFromFamilies(user);
         userRepository.delete(user);
+    }
+
+    /**
+     * HELPER: Ensures the actor can modify the target — only allowed for self.
+     */
+    private void checkModifyPermission(User actor, User targetUser) {
+        if (!actor.getId().equals(targetUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only modify your own account");
+        }
     }
 
     /**
@@ -74,7 +89,7 @@ public class UserService {
     }
 
     /**
-     * HELPER: Updates the email if provided and checks availability.
+     * HELPER: Updates the email if provided and checks that it is not already used.
      */
     private void updateEmail(User user, String email) {
         if (email != null) {
@@ -84,7 +99,7 @@ public class UserService {
     }
 
     /**
-     * HELPER: Updates the password if provided.
+     * HELPER: Updates and encodes the password if provided.
      */
     private void updatePassword(User user, String password) {
         if (password != null) {
@@ -133,7 +148,8 @@ public class UserService {
      */
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     /**

@@ -58,9 +58,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if (!jwtUtil.validateToken(token)) {
             throw new RuntimeException("Invalid JWT token");
         }
-
-        String email = jwtUtil.getEmailFromToken(token);
-        return userRepository.findByEmail(email)
+        Long userId = Long.parseLong(jwtUtil.getUserIdFromToken(token));
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 

@@ -87,7 +87,7 @@ public class FamilyService {
     /**
      * Get a family by ID, including all members.
      */
-    public FamilyDto getFamily(Long familyId, Parent actor) {
+    public FamilyDto getFamily(Long familyId, User actor) {
         Family family = getFamilyOrThrow(familyId);
         verifyFamilyMember(family, actor);
 
@@ -111,14 +111,14 @@ public class FamilyService {
     }
 
     /**
-     * Verify that a parent is a member of the family.
+     * Verify that a user is a member of the family.
      * Throws 403 if not a member.
      */
-    private void verifyFamilyMember(Family family, Parent parent) {
+    private void verifyFamilyMember(Family family, User user) {
         boolean isMember = family.getMembers().stream()
-                .anyMatch(member -> member.getId().equals(parent.getId()));
+                .anyMatch(member -> member.getId().equals(user.getId()));
         if (!isMember) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Parent must belong to the family");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User must belong to the family");
         }
     }
 

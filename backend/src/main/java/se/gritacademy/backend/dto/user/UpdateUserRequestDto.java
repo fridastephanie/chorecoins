@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class UpdateUserRequestDto {
 
+    @Size(max = 50, message = "Firstname cannot exceed 50 character")
     private String firstName;
 
     @Email(message = "Email must be valid")

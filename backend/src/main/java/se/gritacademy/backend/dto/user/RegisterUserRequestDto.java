@@ -12,6 +12,7 @@ import lombok.Setter;
 public class RegisterUserRequestDto {
 
     @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "Firstname cannot exceed 50 character")
     private String firstName;
 
     @NotBlank(message = "Email is required")

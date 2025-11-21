@@ -1,6 +1,10 @@
 package se.gritacademy.backend.entity.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import se.gritacademy.backend.entity.family.Family;
@@ -20,16 +24,22 @@ public abstract class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
     private String firstName;
 
+    @NotBlank
     @Column(unique = true, nullable = false)
+    @Email
     private String email;
 
+    @NotBlank
     @Column(nullable = false)
     private String passwordHash;
 
     // ROLE_CHILD / ROLE_PARENT
+    @NotNull
     @Column(nullable = false)
     private String role;
 

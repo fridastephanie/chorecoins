@@ -1,6 +1,7 @@
 package se.gritacademy.backend.entity.chore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import se.gritacademy.backend.entity.family.Family;
@@ -23,11 +24,18 @@ public class Chore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Column(length = 50, nullable = false)
+    @Size(max = 50)
     private String title;
 
-    @Column(length = 2000)
+    @Column(length = 200)
+    @Size(max = 200)
     private String description;
 
+    @NotNull
+    @PositiveOrZero
+    @Column(nullable = false)
     private BigDecimal value;
 
     @Enumerated(EnumType.STRING)
@@ -45,6 +53,7 @@ public class Chore {
     @JoinColumn(name = "family_id", nullable = false)
     private Family family;
 
+    @FutureOrPresent
     private LocalDate dueDate;
 
     private Instant createdAt = Instant.now();

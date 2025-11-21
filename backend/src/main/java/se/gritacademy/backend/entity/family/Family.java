@@ -1,6 +1,8 @@
 package se.gritacademy.backend.entity.family;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import se.gritacademy.backend.entity.user.User;
@@ -18,6 +20,9 @@ public class Family {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Column(nullable = false, length = 50)
+    @Size(max = 50)
     private String familyName;
 
     @ManyToMany

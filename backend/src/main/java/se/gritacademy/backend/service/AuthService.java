@@ -32,7 +32,7 @@ public class AuthService {
         verifyPassword(rawPassword, user.getPasswordHash());
 
         UserRole userRole = UserRole.valueOf(user.getRole().replace("ROLE_", ""));
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user);
         return new LoginResponseDto(token, userRole.name());
     }
 

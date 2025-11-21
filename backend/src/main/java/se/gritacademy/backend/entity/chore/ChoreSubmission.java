@@ -1,9 +1,11 @@
 package se.gritacademy.backend.entity.chore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import se.gritacademy.backend.entity.user.Child;
+import se.gritacademy.backend.security.EncryptDecryptConverter;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -19,7 +21,9 @@ public class ChoreSubmission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 2000)
+    @Column(length = 200)
+    @Size(max = 200)
+    @Convert(converter = EncryptDecryptConverter.class)
     private String commentChild;
 
     @ElementCollection
@@ -39,6 +43,8 @@ public class ChoreSubmission {
 
     private boolean approvedByParent = false;
 
-    @Column(length = 2000)
+    @Column(length = 200)
+    @Size(max = 200)
+    @Convert(converter = EncryptDecryptConverter.class)
     private String commentParent;
 }

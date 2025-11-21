@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import se.gritacademy.backend.dto.family.CreateFamilyRequestDto;
 import se.gritacademy.backend.dto.family.FamilyDto;
 import se.gritacademy.backend.entity.user.Parent;
+import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.service.FamilyService;
 
 @RestController
@@ -67,7 +68,7 @@ public class FamilyController {
     @PreAuthorize("hasAnyRole('PARENT', 'CHILD')")
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto getFamily(@PathVariable Long familyId,
-                               @AuthenticationPrincipal Parent actor) {
+                               @AuthenticationPrincipal User actor) {
         return familyService.getFamily(familyId, actor);
     }
 }

@@ -43,4 +43,13 @@ public class UserMapper {
         child.setRole("ROLE_CHILD");
         return child;
     }
+
+    public static UserDto fromUser(User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(UserRole.valueOf(user.getRole().replace("ROLE_", "")));
+        return dto;
+    }
 }

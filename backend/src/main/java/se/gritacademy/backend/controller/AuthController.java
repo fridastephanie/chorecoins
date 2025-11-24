@@ -22,4 +22,10 @@ public class AuthController {
     public LoginResponseDto login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
         return authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
     }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(@RequestHeader("Authorization") String authHeader) {
+        authService.logout(authHeader);
+    }
 }

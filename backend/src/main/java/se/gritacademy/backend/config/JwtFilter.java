@@ -7,6 +7,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import se.gritacademy.backend.config.JwtUtil;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.repository.UserRepository;
+import se.gritacademy.backend.service.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,10 +20,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository, TokenBlacklistService tokenBlacklistService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -32,6 +35,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
         if (token != null) {
+            if (isTokenInvalid(token, response)) {
+                return;
+            }
+
             User user = getUserFromToken(token);
             String role = jwtUtil.getRoleFromToken(token);
             setAuthentication(user, role);
@@ -52,12 +59,25 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     /**
+     * HELPER: Check if token is blacklisted or invalid.
+     * If so, send 401 response and return true.
+     */
+    private boolean isTokenInvalid(String token, HttpServletResponse response) throws IOException {
+        if (!jwtUtil.validateToken(token)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+            return true;
+        }
+        if (tokenBlacklistService.isTokenBlacklisted(token)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been invalidated (logged out)");
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * HELPER: Validate token and fetch the corresponding user
      */
     private User getUserFromToken(String token) {
-        if (!jwtUtil.validateToken(token)) {
-            throw new RuntimeException("Invalid JWT token");
-        }
         Long userId = Long.parseLong(jwtUtil.getUserIdFromToken(token));
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

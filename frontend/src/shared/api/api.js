@@ -1,23 +1,16 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:8080/api";
+const api = axios.create({
+  baseURL: "http://localhost:8080/api",
+});
 
-/* REGISTER */
-export const registerUser = (data) =>
-  axios.post(`${API_BASE}/users/register`, data);
+// Request interceptor, adds token if it exists
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-/* LOGIN */
-export const loginUser = (credentials) =>
-  axios.post(`${API_BASE}/auth/login`, credentials);
-
-/* LOGOUT */
-export const logoutUser = (token) =>
-  axios.post(
-    `${API_BASE}/auth/logout`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export default api;

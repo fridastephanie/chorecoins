@@ -1,18 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 import Landing from "../features/landing/Landing";
-import Login from "../features/auth/login/Login";
 import Register from "../features/auth/register/Register";
+import Login from "../features/auth/login/Login";
 import Dashboard from "../features/dashboard/Dashboard";
+import EditUser from "../features/editUser/EditUser";
+import LoggedInLayout from "../shared/components/Layout/LoggedInLayout";
+import ProtectedRoute from "../shared/routes/ProtectedRoute";
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Landing />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+
+      {/* Protected routes */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <LoggedInLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+        <Route path="/edit-user/:id" element={<EditUser />} />
+      </Route>
+    </Routes>
   );
 }

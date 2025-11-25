@@ -6,8 +6,9 @@ export default function Dashboard() {
   const name = user?.firstName || "User";
 
   return (
-    <div className="dashboard-container">
-      <h1>Welcome {name}</h1>
-    </div>
+    <>
+      <div className="dashboard-container">
+      </div>
+    </>
   );
 }

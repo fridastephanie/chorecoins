@@ -1,0 +1,23 @@
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4d4f;
+  color: white;
+  padding: 1em 2em;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 9999;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.error-banner-close {
+  margin-left: auto;
+  font-weight: bold;
+  cursor: pointer;
+}

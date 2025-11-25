@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../../../shared/api/api.js";
+import { useAuth } from "../../../../shared/context/AuthContext";
 import { useError } from "../../../../shared/context/ErrorContext";
 
 export default function LoginForm() {
-  const navigate = useNavigate();
+  const { login } = useAuth();
   const { showError, clearError } = useError();
 
   const [credentials, setCredentials] = useState({
@@ -22,12 +21,9 @@ export default function LoginForm() {
     clearError();
 
     try {
-      const res = await loginUser(credentials);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/dashboard");
+      await login(credentials); // hanterar token + redirect
     } catch (err) {
-      showError("Incorrect email or password");
+      showError(err); 
     }
   };
 

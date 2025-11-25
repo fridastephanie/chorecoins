@@ -25,8 +25,9 @@ public class FamilyController {
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.CREATED)
     public FamilyDto createFamily(@Valid @RequestBody CreateFamilyRequestDto request,
-                                  @AuthenticationPrincipal Parent creator) {
-        return familyService.createFamily(request, creator);
+                                  @AuthenticationPrincipal User creator) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(creator);
+        return familyService.createFamily(request, parent);
     }
 
     @PostMapping("/{familyId}/members/{userId}")
@@ -34,8 +35,9 @@ public class FamilyController {
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto addMember(@PathVariable Long familyId,
                                @PathVariable Long userId,
-                               @AuthenticationPrincipal Parent actor) {
-        return familyService.addMember(familyId, userId, actor);
+                               @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        return familyService.addMember(familyId, userId, parent);
     }
 
     @DeleteMapping("/{familyId}/members/{userId}")
@@ -43,8 +45,9 @@ public class FamilyController {
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto removeMember(@PathVariable Long familyId,
                                   @PathVariable Long userId,
-                                  @AuthenticationPrincipal Parent actor) {
-        return familyService.removeMember(familyId, userId, actor);
+                                  @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        return familyService.removeMember(familyId, userId, parent);
     }
 
     @PatchMapping("/{familyId}")
@@ -52,16 +55,18 @@ public class FamilyController {
     @ResponseStatus(HttpStatus.OK)
     public FamilyDto updateFamilyName(@PathVariable Long familyId,
                                       @RequestBody CreateFamilyRequestDto request,
-                                      @AuthenticationPrincipal Parent actor) {
-        return familyService.updateFamilyName(familyId, request.getFamilyName(), actor);
+                                      @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        return familyService.updateFamilyName(familyId, request.getFamilyName(), parent);
     }
 
     @DeleteMapping("/{familyId}")
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFamily(@PathVariable Long familyId,
-                             @AuthenticationPrincipal Parent actor) {
-        familyService.deleteFamily(familyId, actor);
+                             @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        familyService.deleteFamily(familyId, parent);
     }
 
     @GetMapping("/{familyId}")

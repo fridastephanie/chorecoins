@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import se.gritacademy.backend.dto.chore.*;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
+import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.service.ChoreService;
 
 import java.util.List;
@@ -26,8 +27,9 @@ public class ChoreController {
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.CREATED)
     public ChoreDto createChore(@Valid @RequestBody CreateChoreRequestDto request,
-                                @AuthenticationPrincipal Parent creator) {
-        return choreService.createChore(request, creator);
+                                @AuthenticationPrincipal User creater) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(creater);
+        return choreService.createChore(request, parent);
     }
 
     @GetMapping("/family/{familyId}")
@@ -49,8 +51,9 @@ public class ChoreController {
     @ResponseStatus(HttpStatus.OK)
     public ChoreDto assignChore(@PathVariable Long choreId,
                                 @PathVariable Long childId,
-                                @AuthenticationPrincipal Parent actor) {
-        return choreService.assignChore(choreId, childId, actor);
+                                @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        return choreService.assignChore(choreId, childId, parent);
     }
 
     @PostMapping("/{choreId}/submit")
@@ -58,8 +61,9 @@ public class ChoreController {
     @ResponseStatus(HttpStatus.CREATED)
     public ChoreSubmissionDto submitChore(@PathVariable Long choreId,
                                           @Valid @RequestBody CreateChoreSubmissionDto request,
-                                          @AuthenticationPrincipal Child submitter) {
-        return choreService.submitChore(choreId, request, submitter);
+                                          @AuthenticationPrincipal User submitter) {
+        Child child = se.gritacademy.backend.security.SecurityUtils.requireChild(submitter);
+        return choreService.submitChore(choreId, request, child);
     }
 
     @PatchMapping("/{choreId}/submissions/{submissionId}/approve")
@@ -68,10 +72,10 @@ public class ChoreController {
     public ChoreSubmissionDto approveSubmission(
             @PathVariable Long choreId,
             @PathVariable Long submissionId,
-            @AuthenticationPrincipal Parent approver,
+            @AuthenticationPrincipal User approver,
             @Valid @RequestBody ApproveChoreSubmissionRequestDto request) {
-
-        return choreService.approveSubmission(choreId, submissionId, approver, request.getCommentParent());
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(approver);
+        return choreService.approveSubmission(choreId, submissionId, parent, request.getCommentParent());
     }
 
     @PatchMapping("/{choreId}/submissions/{submissionId}/reject")
@@ -80,17 +84,18 @@ public class ChoreController {
     public ChoreSubmissionDto rejectSubmission(
             @PathVariable Long choreId,
             @PathVariable Long submissionId,
-            @AuthenticationPrincipal Parent approver,
+            @AuthenticationPrincipal User approver,
             @Valid @RequestBody RejectChoreSubmissionRequestDto request) {
-
-        return choreService.rejectSubmission(choreId, submissionId, approver, request.getCommentParent());
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(approver);
+        return choreService.rejectSubmission(choreId, submissionId, parent, request.getCommentParent());
     }
 
     @DeleteMapping("/{choreId}")
     @PreAuthorize("hasRole('PARENT')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteChore(@PathVariable Long choreId,
-                            @AuthenticationPrincipal Parent actor) {
-        choreService.deleteChore(choreId, actor);
+                            @AuthenticationPrincipal User actor) {
+        Parent parent = se.gritacademy.backend.security.SecurityUtils.requireParent(actor);
+        choreService.deleteChore(choreId, parent);
     }
 }

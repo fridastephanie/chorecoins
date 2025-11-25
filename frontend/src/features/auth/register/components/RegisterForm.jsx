@@ -1,7 +1,7 @@
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
-import { registerUser } from "../../../../shared/api/api.js";
+import { registerUser } from "../../../../shared/api/auth.js";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export default function RegisterForm() {
       await registerUser(form);
       navigate("/login");
     } catch (err) {
-      showError(err.response?.data?.message || "Registration failed");
+      showError(err); 
     }
   };
 

@@ -17,12 +17,6 @@ public class UserMapper {
         dto.setFirstName(user.getFirstName());
         dto.setEmail(user.getEmail());
         dto.setRole(UserRole.valueOf(user.getRole().replace("ROLE_", "")));
-
-        if (user instanceof Child child) {
-            dto.setWeekBalance(child.getWeekBalance());
-            dto.setWeekCompletedChoresCount(child.getWeekCompletedChoresCount());
-        }
-
         return dto;
     }
 
@@ -42,14 +36,5 @@ public class UserMapper {
         child.setPasswordHash(encodedPassword);
         child.setRole("ROLE_CHILD");
         return child;
-    }
-
-    public static UserDto fromUser(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setEmail(user.getEmail());
-        dto.setRole(UserRole.valueOf(user.getRole().replace("ROLE_", "")));
-        return dto;
     }
 }

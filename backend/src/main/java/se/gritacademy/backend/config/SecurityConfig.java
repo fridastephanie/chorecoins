@@ -48,9 +48,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/families/**").hasRole("PARENT")
                         .requestMatchers(HttpMethod.PUT, "/api/families/**").hasRole("PARENT")
                         .requestMatchers(HttpMethod.DELETE, "/api/families/**").hasRole("PARENT")
+                        .requestMatchers(HttpMethod.POST, "/api/weekly-stats/**").hasRole("PARENT")
+                        .requestMatchers(HttpMethod.PUT, "/api/weekly-stats/**").hasRole("PARENT")
 
                         // Child AND Parent can view a family
                         .requestMatchers(HttpMethod.GET, "/api/families/**").hasAnyRole("PARENT", "CHILD")
+                        .requestMatchers(HttpMethod.GET, "/api/weekly-stats/**").hasAnyRole("CHILD", "PARENT")
 
                         .anyRequest().authenticated()
                 );

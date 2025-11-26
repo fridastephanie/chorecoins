@@ -95,6 +95,18 @@ public class FamilyService {
     }
 
     /**
+     * Verify that a user is a member of the family.
+     * Throws 403 if not a member.
+     */
+    public void verifyFamilyMember(Family family, User user) {
+        boolean isMember = family.getMembers().stream()
+                .anyMatch(member -> member.getId().equals(user.getId()));
+        if (!isMember) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User must belong to the family");
+        }
+    }
+
+    /**
      * HELPER: Fetch family or throw 404
      */
     private Family getFamilyOrThrow(Long familyId) {
@@ -108,18 +120,6 @@ public class FamilyService {
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
-
-    /**
-     * Verify that a user is a member of the family.
-     * Throws 403 if not a member.
-     */
-    private void verifyFamilyMember(Family family, User user) {
-        boolean isMember = family.getMembers().stream()
-                .anyMatch(member -> member.getId().equals(user.getId()));
-        if (!isMember) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User must belong to the family");
-        }
     }
 
     /**

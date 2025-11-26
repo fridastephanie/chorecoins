@@ -4,18 +4,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import se.gritacademy.backend.dto.chore.*;
+import se.gritacademy.backend.dto.weeklychildstats.CreateWeeklyChildStatsRequestDto;
 import se.gritacademy.backend.entity.chore.*;
 import se.gritacademy.backend.entity.family.Family;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.entity.weeklychildstats.WeeklyChildStats;
 import se.gritacademy.backend.mapper.ChoreMapper;
 import se.gritacademy.backend.mapper.ChoreSubmissionMapper;
+import se.gritacademy.backend.mapper.WeeklyChildStatsMapper;
 import se.gritacademy.backend.repository.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChoreService {
@@ -24,6 +28,7 @@ public class ChoreService {
     private final ChoreSubmissionRepository submissionRepository;
     private final FamilyRepository familyRepository;
     private final UserRepository userRepository;
+    private final WeeklyChildStatsRepository weeklyChildStatsRepository;
     private final ChoreMapper choreMapper;
     private final ChoreSubmissionMapper submissionMapper;
 
@@ -31,109 +36,99 @@ public class ChoreService {
                         ChoreSubmissionRepository submissionRepository,
                         FamilyRepository familyRepository,
                         UserRepository userRepository,
+                        WeeklyChildStatsRepository weeklyChildStatsRepository,
                         ChoreMapper choreMapper,
                         ChoreSubmissionMapper submissionMapper) {
         this.choreRepository = choreRepository;
         this.submissionRepository = submissionRepository;
         this.familyRepository = familyRepository;
         this.userRepository = userRepository;
+        this.weeklyChildStatsRepository = weeklyChildStatsRepository;
         this.choreMapper = choreMapper;
         this.submissionMapper = submissionMapper;
     }
 
     /**
-     * Creates a new chore for a family, optionally assigning it to a child.
+     * Create a new chore in a family and optionally assign it to a child.
      */
     public ChoreDto createChore(CreateChoreRequestDto request, Parent creator) {
         Family family = getFamilyOrThrow(request.getFamilyId());
         verifyFamilyMember(family, creator);
-
         Chore chore = createChoreEntity(request, family, creator);
         assignChildIfProvided(chore, request, family);
-
         return choreMapper.toDto(saveChore(chore));
     }
 
     /**
-     * Retrieves a chore by its ID.
+     * Get a chore by its ID or throw 404 if not found.
      */
     public ChoreDto getChore(Long choreId) {
         return choreMapper.toDto(getChoreOrThrow(choreId));
     }
 
     /**
-     * Retrieves all chores for a given family.
+     * Get all chores for a given family.
      */
     public List<ChoreDto> getChoresForFamily(Long familyId) {
-        getFamilyOrThrow(familyId); // verify family exists
+        getFamilyOrThrow(familyId);
         return choreRepository.findByFamily_Id(familyId)
                 .stream()
                 .map(choreMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
-     * Assigns a chore to a specific child (parent action).
+     * Assign a chore to a specific child and update its status.
      */
     public ChoreDto assignChore(Long choreId, Long childId, Parent actor) {
         Chore chore = getChoreOrThrow(choreId);
         User child = getUserOrThrow(childId);
-
         verifyFamilyMember(chore.getFamily(), actor);
         verifyFamilyMember(chore.getFamily(), child);
-
         updateChoreAssignment(chore, (Child) child, ChoreStatus.NOT_STARTED);
-
         return choreMapper.toDto(chore);
     }
 
     /**
-     * Submits a chore by a child, including comments and images.
+     * Submit a chore as a child, creating a submission entity and marking the chore DONE.
      */
     public ChoreSubmissionDto submitChore(Long choreId, CreateChoreSubmissionDto request, Child submitter) {
         Chore chore = getChoreOrThrow(choreId);
         verifyAssignedChild(chore, submitter);
-
         ChoreSubmission submission = createSubmissionEntity(chore, request, submitter);
         ChoreSubmission saved = saveSubmission(submission);
-
         updateChoreStatus(chore, ChoreStatus.DONE);
-
         return submissionMapper.toDto(saved);
     }
 
     /**
-     * Approves a child's chore submission and updates the chore and child's balance.
+     * Approve a chore submission and update the child's weekly stats accordingly.
      */
     public ChoreSubmissionDto approveSubmission(Long choreId, Long submissionId, Parent approver, String parentComment) {
         Chore chore = getChoreOrThrow(choreId);
         ChoreSubmission submission = getSubmissionOrThrow(submissionId);
         verifyFamilyMember(chore.getFamily(), approver);
         verifySubmissionBelongsToChore(submission, chore);
-
         updateSubmissionApproval(submission, true, parentComment);
         updateChoreStatus(chore, ChoreStatus.APPROVED);
-        updateChildBalance(chore);
-
+        updateChildWeeklyStats(chore);
         return submissionMapper.toDto(submission);
     }
 
     /**
-     * Rejects a child's chore submission, providing a reason as a parent comment.
+     * Reject a chore submission and reset the chore status to NOT_STARTED.
      */
     public ChoreSubmissionDto rejectSubmission(Long choreId, Long submissionId, Parent approver, String reason) {
         Chore chore = getChoreOrThrow(choreId);
         ChoreSubmission submission = getSubmissionOrThrow(submissionId);
         verifyFamilyMember(chore.getFamily(), approver);
-
         updateSubmissionApproval(submission, false, reason);
         updateChoreStatus(chore, ChoreStatus.NOT_STARTED);
-
         return submissionMapper.toDto(submission);
     }
 
     /**
-     * Deletes a chore, verifying that the actor is a member of the family.
+     * Delete a chore if the acting parent belongs to the family.
      */
     public void deleteChore(Long choreId, Parent actor) {
         Chore chore = getChoreOrThrow(choreId);
@@ -142,7 +137,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Retrieve chore by ID or throw 404
+     * HELPER: Get a chore by ID or throw 404 if not found.
      */
     private Chore getChoreOrThrow(Long choreId) {
         return choreRepository.findById(choreId)
@@ -150,7 +145,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Retrieve family by ID or throw 404
+     * HELPER: Get a family by ID or throw 404 if not found.
      */
     private Family getFamilyOrThrow(Long familyId) {
         return familyRepository.findById(familyId)
@@ -158,7 +153,23 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Verify a user is a member of a family
+     * HELPER: Get a user by ID or throw 404 if not found.
+     */
+    private User getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    /**
+     * HELPER: Get a submission by ID or throw 404 if not found.
+     */
+    private ChoreSubmission getSubmissionOrThrow(Long submissionId) {
+        return submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Submission not found"));
+    }
+
+    /**
+     * HELPER: Verify a user is a member of a given family, else throw 403.
      */
     private void verifyFamilyMember(Family family, User user) {
         boolean isMember = family.getMembers().stream()
@@ -167,15 +178,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Retrieve user by ID or throw 404
-     */
-    private User getUserOrThrow(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
-
-    /**
-     * HELPER: Verify child is assigned to chore
+     * HELPER: Verify a chore is assigned to the provided child.
      */
     private void verifyAssignedChild(Chore chore, Child child) {
         if (chore.getAssignedTo() == null || !chore.getAssignedTo().getId().equals(child.getId())) {
@@ -184,7 +187,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Verify submission belongs to chore
+     * HELPER: Verify a submission belongs to a chore, else throw 400.
      */
     private void verifySubmissionBelongsToChore(ChoreSubmission submission, Chore chore) {
         if (!submission.getChore().getId().equals(chore.getId())) {
@@ -193,7 +196,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Create a new Chore entity
+     * HELPER: Create a Chore entity from the DTO and set timestamps.
      */
     private Chore createChoreEntity(CreateChoreRequestDto request, Family family, Parent creator) {
         Chore chore = new Chore();
@@ -210,8 +213,8 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Create a new ChoreSubmission entity
-     * */
+     * HELPER: Create a ChoreSubmission entity from DTO and set timestamps.
+     */
     private ChoreSubmission createSubmissionEntity(Chore chore, CreateChoreSubmissionDto request, Child submitter) {
         ChoreSubmission submission = new ChoreSubmission();
         submission.setChore(chore);
@@ -224,39 +227,32 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Save a chore
+     * HELPER: Save a chore to the repository.
      */
     private Chore saveChore(Chore chore) {
         return choreRepository.save(chore);
     }
 
     /**
-     * HELPER: Save a submission
+     * HELPER: Save a submission to the repository.
      */
     private ChoreSubmission saveSubmission(ChoreSubmission submission) {
         return submissionRepository.save(submission);
     }
 
     /**
-     * HELPER: Assign child to chore if assignedChildId is provided in the request
+     * HELPER: Assign a child to a chore and update its status.
      */
     private void assignChildIfProvided(Chore chore, CreateChoreRequestDto request, Family family) {
         if (request.getAssignedChildId() != null) {
             User child = getUserOrThrow(request.getAssignedChildId());
             verifyFamilyMember(family, child);
-            assignChildToChore(chore, (Child) child);
+            updateChoreAssignment(chore, (Child) child, ChoreStatus.NOT_STARTED);
         }
     }
 
     /**
-     * HELPER: Assign a child to a chore (used in create & assign)
-     */
-    private void assignChildToChore(Chore chore, Child child) {
-        updateChoreAssignment(chore, child, ChoreStatus.NOT_STARTED);
-    }
-
-    /**
-     * HELPER: Update chore assignment, status, and timestamp
+     * HELPER: Update chore assignment and timestamp.
      */
     private void updateChoreAssignment(Chore chore, Child child, ChoreStatus status) {
         chore.setAssignedTo(child);
@@ -266,7 +262,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Update submission approval status and parent comment
+     * HELPER: Approve or reject a submission and save changes.
      */
     private void updateSubmissionApproval(ChoreSubmission submission, boolean approved, String parentComment) {
         submission.setApprovedByParent(approved);
@@ -275,7 +271,7 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Update chore status and timestamp
+     * HELPER: Update chore status and timestamp.
      */
     private void updateChoreStatus(Chore chore, ChoreStatus status) {
         chore.setStatus(status);
@@ -284,23 +280,44 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Update child week balance and completed chore count
+     * HELPER: Update weekly stats for a child when a chore is completed.
      */
-    private void updateChildBalance(Chore chore) {
-        Child child = chore.getAssignedTo();
-        if (child != null && chore.getValue() != null) {
-            if (child.getWeekBalance() == null) child.setWeekBalance(chore.getValue());
-            else child.setWeekBalance(child.getWeekBalance().add(chore.getValue()));
-            child.setWeekCompletedChoresCount(child.getWeekCompletedChoresCount() + 1);
-            userRepository.save(child);
-        }
+    private void updateChildWeeklyStats(Chore chore) {
+        if (chore.getAssignedTo() == null || chore.getValue() == null) return;
+
+        WeeklyChildStats stats = getOrCreateWeeklyStats(chore.getAssignedTo(), chore.getFamily());
+        incrementWeeklyStats(stats, chore.getValue());
     }
 
     /**
-     * HELPER: Retrieve submission by ID or throw 404
+     * HELPER: Get or create weekly stats for a child and family for the current week/year.
      */
-    private ChoreSubmission getSubmissionOrThrow(Long submissionId) {
-        return submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Submission not found"));
+    private WeeklyChildStats getOrCreateWeeklyStats(Child child, Family family) {
+        LocalDate today = LocalDate.now();
+        WeekFields weekFields = WeekFields.of(java.util.Locale.getDefault());
+        int weekNumber = today.get(weekFields.weekOfWeekBasedYear());
+        int year = today.getYear();
+
+        return weeklyChildStatsRepository
+                .findByChildIdAndFamilyIdAndWeekNumberAndYear(child.getId(), family.getId(), weekNumber, year)
+                .orElseGet(() -> {
+                    CreateWeeklyChildStatsRequestDto dto = new CreateWeeklyChildStatsRequestDto();
+                    dto.setChildId(child.getId());
+                    dto.setFamilyId(family.getId());
+                    dto.setWeekNumber(weekNumber);
+                    dto.setYear(year);
+                    dto.setCompletedChoresCount(0);
+                    dto.setEarnedCoins(java.math.BigDecimal.ZERO);
+                    return weeklyChildStatsRepository.save(WeeklyChildStatsMapper.fromDto(dto, child, family));
+                });
+    }
+
+    /**
+     * HELPER: Increment completed chores and earned coins for weekly stats.
+     */
+    private void incrementWeeklyStats(WeeklyChildStats stats, java.math.BigDecimal value) {
+        stats.setCompletedChoresCount(stats.getCompletedChoresCount() + 1);
+        stats.setEarnedCoins(stats.getEarnedCoins().add(value));
+        weeklyChildStatsRepository.save(stats);
     }
 }

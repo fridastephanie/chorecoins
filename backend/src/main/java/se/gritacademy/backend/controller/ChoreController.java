@@ -39,6 +39,14 @@ public class ChoreController {
         return choreService.getChoresForFamily(familyId);
     }
 
+    @GetMapping("/child/{childId}")
+    @PreAuthorize("hasAnyRole('PARENT','CHILD')")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ChoreDto> getChoresForChild(@PathVariable Long childId,
+                                            @AuthenticationPrincipal User user) {
+        return choreService.getChoresForChild(childId, user);
+    }
+
     @GetMapping("/{choreId}")
     @PreAuthorize("hasAnyRole('PARENT','CHILD')")
     @ResponseStatus(HttpStatus.OK)

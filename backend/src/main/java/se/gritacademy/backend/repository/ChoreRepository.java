@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ChoreRepository extends JpaRepository<Chore, Long> {
     List<Chore> findByFamily_Id(Long familyId);
+    List<Chore> findByAssignedTo_Id(Long childId);
 }

@@ -78,14 +78,26 @@ public class ChoreService {
     }
 
     /**
+     * Get all chores assigned to a specific child.
+     */
+    public List<ChoreDto> getChoresForChild(Long childId, User currentUser) {
+        List<Chore> chores = choreRepository.findByAssignedTo_Id(childId);
+        chores = filterChoresForUser(chores, currentUser, childId);
+        return chores.stream()
+                .map(choreMapper::toDto)
+                .toList();
+    }
+
+    /**
      * Assign a chore to a specific child and update its status.
      */
     public ChoreDto assignChore(Long choreId, Long childId, Parent actor) {
         Chore chore = getChoreOrThrow(choreId);
-        User child = getUserOrThrow(childId);
+        User user = getUserOrThrow(childId);
         verifyFamilyMember(chore.getFamily(), actor);
-        verifyFamilyMember(chore.getFamily(), child);
-        updateChoreAssignment(chore, (Child) child, ChoreStatus.NOT_STARTED);
+        verifyFamilyMember(chore.getFamily(), user);
+        Child child = ensureChild(user);
+        updateChoreAssignment(chore, child, ChoreStatus.NOT_STARTED);
         return choreMapper.toDto(chore);
     }
 
@@ -109,6 +121,7 @@ public class ChoreService {
         ChoreSubmission submission = getSubmissionOrThrow(submissionId);
         verifyFamilyMember(chore.getFamily(), approver);
         verifySubmissionBelongsToChore(submission, chore);
+        ensureChoreNotAlreadyApproved(chore);
         updateSubmissionApproval(submission, true, parentComment);
         updateChoreStatus(chore, ChoreStatus.APPROVED);
         updateChildWeeklyStats(chore);
@@ -153,11 +166,67 @@ public class ChoreService {
     }
 
     /**
+     * HELPER: Filter chores based on the type of user.
+     * CHILD users can only access their own chores.
+     * PARENT users can only access chores in their family.
+     */
+    private List<Chore> filterChoresForUser(List<Chore> chores, User user, Long requestedChildId) {
+        if (user instanceof Child child) {
+            return filterChoresForChild(chores, child, requestedChildId);
+        } else if (user instanceof Parent parent) {
+            return filterChoresForParent(chores, parent);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not authorized to see chores");
+        }
+    }
+
+
+    /**
+     * HELPER: CHILD can only see their own chores.
+     * Throws 403 if child tries to access another child's chores.
+     */
+    private List<Chore> filterChoresForChild(List<Chore> chores, Child child, Long requestedChildId) {
+        if (!child.getId().equals(requestedChildId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Children can only access their own chores");
+        }
+        return chores.stream()
+                .filter(chore -> chore.getAssignedTo() != null && chore.getAssignedTo().getId().equals(child.getId()))
+                .toList();
+    }
+
+    /**
+     * HELPER: PARENT can only see chores belonging to their family.
+     * Throws 403 if none of the chores belong to their family.
+     */
+    private List<Chore> filterChoresForParent(List<Chore> chores, Parent parent) {
+        List<Chore> authorizedChores = chores.stream()
+                .filter(chore -> chore.getFamily().getMembers().stream()
+                        .anyMatch(member -> member.getId().equals(parent.getId())))
+                .toList();
+
+        if (authorizedChores.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to see these chores");
+        }
+
+        return authorizedChores;
+    }
+
+    /**
      * HELPER: Get a user by ID or throw 404 if not found.
      */
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    /**
+     * HELPER: Ensure the given user is a Child, else throw 403 Forbidden.
+     */
+    private Child ensureChild(User user) {
+        if (!(user instanceof Child child)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a child");
+        }
+        return child;
     }
 
     /**
@@ -192,6 +261,16 @@ public class ChoreService {
     private void verifySubmissionBelongsToChore(ChoreSubmission submission, Chore chore) {
         if (!submission.getChore().getId().equals(chore.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submission does not belong to chore");
+        }
+    }
+
+    /**
+     * HELPER: Ensure the chore is not already approved.
+     * Throws 400 Bad Request if chore is already approved.
+     */
+    private void ensureChoreNotAlreadyApproved(Chore chore) {
+        if (chore.getStatus() == ChoreStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chore is already approved");
         }
     }
 
@@ -241,13 +320,15 @@ public class ChoreService {
     }
 
     /**
-     * HELPER: Assign a child to a chore and update its status.
+     * HELPER: Assign a child to a chore if provided in the request and update its status.
      */
     private void assignChildIfProvided(Chore chore, CreateChoreRequestDto request, Family family) {
         if (request.getAssignedChildId() != null) {
-            User child = getUserOrThrow(request.getAssignedChildId());
-            verifyFamilyMember(family, child);
-            updateChoreAssignment(chore, (Child) child, ChoreStatus.NOT_STARTED);
+            User user = getUserOrThrow(request.getAssignedChildId());
+            verifyFamilyMember(family, user);
+
+            Child child = ensureChild(user);
+            updateChoreAssignment(chore, child, ChoreStatus.NOT_STARTED);
         }
     }
 

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "../../../shared/hooks/useForm";
 import { validateFirstName, validateEmail, validatePassword, validateConfirmPassword } from "../../../shared/utils/validation";
 import { useUserApi } from "../../../shared/hooks/useUserApi";
+
+const userCache = {}; // Simple in-memory cache for user data keyed by userId
 
 export function useEditUserForm(user, onDeleteSuccess) {
   const { fetchUser, updateUserData, deleteUserAccount, loading, error } = useUserApi();
@@ -12,30 +14,36 @@ export function useEditUserForm(user, onDeleteSuccess) {
     confirmPassword: ""
   });
   const [errors, setErrors] = useState({});
-  const [originalValues, setOriginalValues] = useState({ firstName: "", email: "" }); 
-  const fetched = useRef(false);
+  const [originalValues, setOriginalValues] = useState({ firstName: "", email: "" });
 
   /**
-   * Fetches the full user data from the backend when the component mounts.
+   * Fetches the full user data from the backend when the component mounts or when userId changes.
    * Populates the form with the user's current first name and email, leaving password fields empty.
    * Stores original fetched values to compare against during updates.
-   * Ensures the fetch only happens once per session.
+   * Uses in-memory cache to prevent repeated requests when navigating back to the edit page.
    */
   useEffect(() => {
-    if (!user || fetched.current) return;
+    if (!user) return;
 
     const loadUser = async () => {
       try {
-        const data = await fetchUser(user.id);
+        let data;
+        if (userCache[user.id]) {
+          data = userCache[user.id]; // Use cached data
+        } else {
+          data = await fetchUser(user.id);
+          userCache[user.id] = data; // Store in cache
+        }
+
         const initialValues = {
           firstName: data.firstName || "",
           email: data.email || "",
           password: "",
           confirmPassword: ""
         };
+
         setValues(initialValues);
         setOriginalValues({ firstName: data.firstName || "", email: data.email || "" });
-        fetched.current = true;
       } catch (_) {}
     };
 
@@ -74,7 +82,9 @@ export function useEditUserForm(user, onDeleteSuccess) {
     if (values.password) payload.password = values.password;
     if (Object.keys(payload).length === 0) return null;
 
-    return updateUserData(user.id, payload);
+    const updatedUser = await updateUserData(user.id, payload);
+    userCache[user.id] = updatedUser; // Update cache with latest values
+    return updatedUser;
   };
 
   /**
@@ -84,6 +94,7 @@ export function useEditUserForm(user, onDeleteSuccess) {
   const handleDelete = async () => {
     await deleteUserAccount(user.id);
     if (onDeleteSuccess) onDeleteSuccess();
+    delete userCache[user.id]; // Remove from cache on delete
   };
 
   return { values, errors, handleChange, isValid, handleUpdate, handleDelete, loading, error };

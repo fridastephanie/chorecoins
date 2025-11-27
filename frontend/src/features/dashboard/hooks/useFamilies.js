@@ -1,29 +1,26 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useUserApi } from "../../../shared/hooks/useUserApi";
 
-/**
- * Custom hook to fetch and manage the families associated with a given user.
- * Handles fetching, storing, and updating family data in local state.
- */
+const familyCache = {}; // Simple in-memory cache keyed by userId
+
 export default function useFamilies(userId) {
   const { fetchUserFamilies } = useUserApi();
-  const [families, setFamilies] = useState([]);
+  const [families, setFamilies] = useState(() => familyCache[userId] || []);
   const [error, setError] = useState(null);
-  const fetched = useRef(false);
 
   /**
-   * Fetches the families for the given user from the backend.
-   * Populates the local `families` state and ensures the fetch only occurs once.
+   * Fetches the families for the given user from the backend if not cached.
+   * Updates the in-memory cache and local state.
    * Sets the `error` state if the fetch fails.
    */
   useEffect(() => {
-    if (!userId || fetched.current) return;
+    if (!userId || familyCache[userId]) return; // Skip if cached
 
     const loadFamilies = async () => {
       try {
         const res = await fetchUserFamilies(userId);
-        setFamilies(res);
-        fetched.current = true;
+        familyCache[userId] = res; // Update cache
+        setFamilies(res); // Update state
       } catch (err) {
         console.error("Failed to fetch families:", err);
         setError("Failed to load families.");
@@ -35,11 +32,15 @@ export default function useFamilies(userId) {
 
   /**
    * Adds a new family to the existing families state.
-   * Useful for immediately reflecting newly created families in the UI.
+   * Updates both local state and the in-memory cache.
    * @param {Object} family - The new family object to add
    */
   const addFamily = (family) => {
-    setFamilies((prev) => [...prev, family]);
+    setFamilies((prev) => {
+      const updated = [...prev, family];
+      familyCache[userId] = updated; // Update cache
+      return updated;
+    });
   };
 
   return {

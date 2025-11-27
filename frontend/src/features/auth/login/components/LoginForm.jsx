@@ -21,9 +21,9 @@ export default function LoginForm() {
     clearError();
 
     try {
-      await login(credentials); // hanterar token + redirect
+      await login(credentials); 
     } catch (err) {
-      showError(err); 
+      showError(err, "login"); 
     }
   };
 

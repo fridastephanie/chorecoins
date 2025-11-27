@@ -4,12 +4,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import se.gritacademy.backend.dto.family.FamilyDto;
 import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
 import se.gritacademy.backend.dto.user.UpdateUserRequestDto;
 import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.mapper.FamilyMapper;
 import se.gritacademy.backend.mapper.UserMapper;
 import se.gritacademy.backend.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -17,13 +22,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final FamilyMapper familyMapper;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       UserMapper userMapper) {
+                       UserMapper userMapper, FamilyMapper familyMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.familyMapper = familyMapper;
     }
 
     /**
@@ -68,6 +75,15 @@ public class UserService {
         checkModifyPermission(actor, user);
         removeUserFromFamilies(user);
         userRepository.delete(user);
+    }
+
+    /**
+     * Retrieves all families a user belongs to.
+     */
+    public List<FamilyDto> getUserFamilies(Long userId, User actor) {
+        User user = getUserOrThrow(userId);
+        checkViewPermission(actor, user);
+        return mapFamiliesToDto(user);
     }
 
     /**
@@ -158,5 +174,23 @@ public class UserService {
     private void removeUserFromFamilies(User user) {
         user.getFamilies().forEach(family -> family.getMembers().remove(user));
         user.getFamilies().clear();
+    }
+
+    /**
+     * HELPER: Check that actor can see user's families.
+     */
+    private void checkViewPermission(User actor, User targetUser) {
+        if (!actor.getId().equals(targetUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only view your own families");
+        }
+    }
+
+    /**
+     * HELPER: Maps all families to FamilyDto
+     */
+    private List<FamilyDto> mapFamiliesToDto(User user) {
+        return user.getFamilies().stream()
+                .map(familyMapper::toFamilyDto)
+                .collect(Collectors.toList());
     }
 }

@@ -12,11 +12,13 @@ export function useEditUserForm(user, onDeleteSuccess) {
     confirmPassword: ""
   });
   const [errors, setErrors] = useState({});
+  const [originalValues, setOriginalValues] = useState({ firstName: "", email: "" }); 
   const fetched = useRef(false);
 
   /**
    * Fetches the full user data from the backend when the component mounts.
    * Populates the form with the user's current first name and email, leaving password fields empty.
+   * Stores original fetched values to compare against during updates.
    * Ensures the fetch only happens once per session.
    */
   useEffect(() => {
@@ -25,12 +27,14 @@ export function useEditUserForm(user, onDeleteSuccess) {
     const loadUser = async () => {
       try {
         const data = await fetchUser(user.id);
-        setValues({
+        const initialValues = {
           firstName: data.firstName || "",
           email: data.email || "",
           password: "",
           confirmPassword: ""
-        });
+        };
+        setValues(initialValues);
+        setOriginalValues({ firstName: data.firstName || "", email: data.email || "" });
         fetched.current = true;
       } catch (_) {}
     };
@@ -41,7 +45,7 @@ export function useEditUserForm(user, onDeleteSuccess) {
   /**
    * Runs live validation on all form fields whenever their values change.
    * Validates first name, email, and password/confirm password only if password is being updated.
-   * Updates the `errors` state accordingly for UI feedback.
+   * Updates the `errors` state for UI feedback.
    */
   useEffect(() => {
     setErrors({
@@ -60,13 +64,13 @@ export function useEditUserForm(user, onDeleteSuccess) {
 
   /**
    * Prepares a payload of updated fields and sends it to the backend.
-   * Only includes fields that have changed compared to the original user data.
+   * Only includes fields that have changed compared to the original fetched values.
    * Returns null if no fields were modified to avoid unnecessary API calls.
    */
   const handleUpdate = async () => {
     const payload = {};
-    if (values.firstName && values.firstName !== user.firstName) payload.firstName = values.firstName;
-    if (values.email && values.email !== user.email) payload.email = values.email;
+    if (values.firstName && values.firstName !== originalValues.firstName) payload.firstName = values.firstName;
+    if (values.email && values.email !== originalValues.email) payload.email = values.email;
     if (values.password) payload.password = values.password;
     if (Object.keys(payload).length === 0) return null;
 

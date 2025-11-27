@@ -1,26 +1,28 @@
 import { useState } from "react";
-import { createFamily } from "../../../shared/api/family";
 import Modal from "../../../shared/components/modal/Modal";
 import { useError } from "../../../shared/context/ErrorContext";
+import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
 
 export default function NewFamilyModal({ onClose, onFamilyCreated }) {
   const { showError, clearError } = useError();
+  const { addFamily, loading } = useFamilyApi(); 
   const [familyName, setFamilyName] = useState("");
-  const [loading, setLoading] = useState(false);
 
+  /**
+   * Handles form submission for creating a new family.
+   * Calls addFamily from the useFamilyApi hook, updates parent state with the new family,
+   * and closes the modal. Displays error using the error context if the creation fails.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
-    setLoading(true);
 
     try {
-      const res = await createFamily({ familyName });
-      onFamilyCreated(res.data);
+      const newFamily = await addFamily({ familyName });
+      onFamilyCreated(newFamily);
       onClose();
     } catch (err) {
       showError(err, "create-family");
-    } finally {
-      setLoading(false);
     }
   };
 

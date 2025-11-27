@@ -1,15 +1,23 @@
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
-import { registerUser } from "../../../../shared/api/user.js";
+import { useUserApi } from "../../../../shared/hooks/useUserApi";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const { showError } = useError();
+  const { showError, clearError } = useError();
   const { form, errors, handleChange, isValid } = useRegisterForm();
+  const { registerNewUser, loading } = useUserApi();
 
+  /**
+   * Handles form submission for user registration.
+   * Validates form fields, calls registerNewUser from useUserApi,
+   * and navigates to the login page on success.
+   * Displays any validation or server errors using the error context.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    clearError();
 
     if (!isValid()) {
       showError("Please fix the errors before submitting");
@@ -17,10 +25,10 @@ export default function RegisterForm() {
     }
 
     try {
-      await registerUser(form);
+      await registerNewUser(form);
       navigate("/login");
     } catch (err) {
-      showError(err); 
+      showError(err);
     }
   };
 
@@ -97,7 +105,9 @@ export default function RegisterForm() {
         </label>
       </div>
 
-      <button type="submit">Register</button>
+      <button type="submit" disabled={loading}>
+        {loading ? "Registering.." : "Register"}
+      </button>
     </form>
   );
 }

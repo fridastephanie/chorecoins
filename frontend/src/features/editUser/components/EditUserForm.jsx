@@ -10,10 +10,11 @@ export default function EditUserForm() {
   const navigate = useNavigate();
   const { showError, clearError } = useError();
   const { user, logout } = useAuth();
-  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageModalContent, setMessageModalContent] = useState("");
 
-  // Initialize the edit user form hook and provide a callback to handle post-deletion actions,
-  // such as logging out the user and redirecting to the login page.
+  // Initialize the edit user form hook and provide a callback to handle post-deletion actions
   const { values, errors, handleChange, isValid, handleUpdate, handleDelete, loading } =
     useEditUserForm(user, () => {
       logout();
@@ -23,7 +24,7 @@ export default function EditUserForm() {
   /**
    * Handles form submission for updating user data.
    * Validates input and calls handleUpdate from the hook.
-   * Alerts user on success or if no changes were made.
+   * Shows modal with success or no-change message.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,8 +37,9 @@ export default function EditUserForm() {
 
     try {
       const res = await handleUpdate();
-      if (res) alert("User updated successfully!");
-      else alert("No changes to update.");
+      if (res) setMessageModalContent("User updated successfully!");
+      else setMessageModalContent("No changes to update.");
+      setShowMessageModal(true);
     } catch (err) {
       showError(err);
     }
@@ -46,12 +48,11 @@ export default function EditUserForm() {
   /**
    * Opens the delete confirmation modal.
    */
-  const handleDeleteClick = () => setShowModal(true);
+  const handleDeleteClick = () => setShowDeleteModal(true);
 
   /**
    * Confirms account deletion.
    * Calls handleDelete from the hook and closes the modal.
-   * Any errors are shown using the error context.
    * onDeleteSuccess callback will handle logout & redirect.
    */
   const confirmDelete = async () => {
@@ -60,7 +61,7 @@ export default function EditUserForm() {
     } catch (err) {
       showError(err);
     } finally {
-      setShowModal(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -116,14 +117,26 @@ export default function EditUserForm() {
         </button>
       </form>
 
-      {showModal && (
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
         <Modal
           title="Confirm Delete"
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowDeleteModal(false)}
         >
           <p>Are you sure you want to delete your account? This cannot be undone.</p>
           <button onClick={confirmDelete} style={{ marginRight: "10px", color: "red" }}>Yes, Delete</button>
-          <button onClick={() => setShowModal(false)}>Cancel</button>
+          <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
+        </Modal>
+      )}
+
+      {/* Success / info modal */}
+      {showMessageModal && (
+        <Modal
+          title="Information"
+          onClose={() => setShowMessageModal(false)}
+        >
+          <p>{messageModalContent}</p>
+          <button onClick={() => setShowMessageModal(false)}>OK</button>
         </Modal>
       )}
     </>

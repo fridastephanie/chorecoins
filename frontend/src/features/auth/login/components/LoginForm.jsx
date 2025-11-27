@@ -1,29 +1,24 @@
-import { useState } from "react";
 import { useAuth } from "../../../../shared/context/AuthContext";
 import { useError } from "../../../../shared/context/ErrorContext";
+import { useLoginForm } from "../hooks/useLoginForm";
 
 export default function LoginForm() {
   const { login } = useAuth();
   const { showError, clearError } = useError();
+  const { credentials, handleChange } = useLoginForm();
 
-  const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    clearError();
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
-
+  /**
+   * Handles form submission for login.
+   * Calls login from AuthContext and shows errors if login fails.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
 
     try {
-      await login(credentials); 
+      await login(credentials);
     } catch (err) {
-      showError(err, "login"); 
+      showError(err, "login");
     }
   };
 

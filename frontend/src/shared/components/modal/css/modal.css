@@ -19,6 +19,7 @@
   max-width: 500px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   position: relative;
+  color:black;
 }
 
 .modal h2 {
@@ -37,4 +38,5 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
+  color: black;
 }

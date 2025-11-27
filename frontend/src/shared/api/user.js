@@ -8,3 +8,9 @@ export const getUser = (id) =>
 
 export const getUserFamilies = (userId) =>
   api.get(`/users/${userId}/families`);
+
+export const updateUser = (userId, data) =>
+  api.patch(`/users/${userId}`, data);
+
+export const deleteUser = (userId) =>
+  api.delete(`/users/${userId}`);

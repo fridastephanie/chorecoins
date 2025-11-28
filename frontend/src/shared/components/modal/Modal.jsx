@@ -1,12 +1,14 @@
 import "./css/modal.css"; 
 
-export default function Modal({ onClose, title, children }) {
+export default function Modal({ title, children, onClose }) {
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        {title && <h2>{title}</h2>}
-        <div className="modal-content">{children}</div>
-        <button className="modal-close" onClick={onClose}>Close</button>
+    <div className="modal-backdrop">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h2>{title}</h2>
+          <button onClick={onClose}>X</button>
+        </div>
+        <div className="modal-body">{children}</div>
       </div>
     </div>
   );

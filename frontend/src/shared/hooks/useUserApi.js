@@ -1,11 +1,18 @@
 import { useState, useCallback } from "react";
-import { registerUser, getUser, updateUser, deleteUser, getUserFamilies } from "../api/user";
+import {
+  registerUser,
+  getUser,
+  getUserByEmail,
+  updateUser,
+  deleteUser,
+  getUserFamilies
+} from "../api/user";
 
 export function useUserApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-   const registerNewUser = useCallback(async (payload) => {
+  const registerNewUser = useCallback(async (payload) => {
     setLoading(true);
     setError(null);
     try {
@@ -19,11 +26,13 @@ export function useUserApi() {
     }
   }, []);
 
-  const fetchUser = useCallback(async (userId) => {
+  const fetchUser = useCallback(async (userIdOrEmail) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getUser(userId);
+      const res = typeof userIdOrEmail === "string" && userIdOrEmail.includes("@")
+        ? await getUserByEmail(userIdOrEmail)
+        : await getUser(userIdOrEmail);
       return res.data;
     } catch (err) {
       setError(err);

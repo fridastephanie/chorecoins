@@ -8,3 +8,12 @@ export const getFamily = (id) =>
 
 export const addMember = (familyId, userId) =>
   api.post(`/families/${familyId}/members/${userId}`);
+
+export const removeMember = (familyId, userId) =>
+  api.delete(`/families/${familyId}/members/${userId}`);
+
+export const updateFamilyName = (familyId, data) =>
+  api.patch(`/families/${familyId}`, data);
+
+export const deleteFamily = (familyId) =>
+  api.delete(`/families/${familyId}`);

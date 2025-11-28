@@ -103,14 +103,12 @@ public class ChoreService {
 
     /**
      * Submit a chore as a child, creating a submission entity and marking the chore DONE.
+     * Returns the chore with updated status so the frontend can immediately reflect the change.
      */
-    public ChoreSubmissionDto submitChore(Long choreId, CreateChoreSubmissionDto request, Child submitter) {
+    public ChoreDto submitChoreAndReturnChore(Long choreId, CreateChoreSubmissionDto request, Child submitter) {
+        submitChore(choreId, request, submitter);
         Chore chore = getChoreOrThrow(choreId);
-        verifyAssignedChild(chore, submitter);
-        ChoreSubmission submission = createSubmissionEntity(chore, request, submitter);
-        ChoreSubmission saved = saveSubmission(submission);
-        updateChoreStatus(chore, ChoreStatus.DONE);
-        return submissionMapper.toDto(saved);
+        return choreMapper.toDto(chore);
     }
 
     /**
@@ -166,6 +164,18 @@ public class ChoreService {
     }
 
     /**
+     * HELPER: Submit a chore as a child, creating a submission entity and marking the chore DONE.
+     */
+    private ChoreSubmissionDto submitChore(Long choreId, CreateChoreSubmissionDto request, Child submitter) {
+        Chore chore = getChoreOrThrow(choreId);
+        verifyAssignedChild(chore, submitter);
+        ChoreSubmission submission = createSubmissionEntity(chore, request, submitter);
+        ChoreSubmission saved = saveSubmission(submission);
+        updateChoreStatus(chore, ChoreStatus.DONE);
+        return submissionMapper.toDto(saved);
+    }
+
+    /**
      * HELPER: Filter chores based on the type of user.
      * CHILD users can only access their own chores.
      * PARENT users can only access chores in their family.
@@ -179,7 +189,6 @@ public class ChoreService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not authorized to see chores");
         }
     }
-
 
     /**
      * HELPER: CHILD can only see their own chores.

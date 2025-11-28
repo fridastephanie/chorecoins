@@ -67,11 +67,11 @@ public class ChoreController {
     @PostMapping("/{choreId}/submit")
     @PreAuthorize("hasRole('CHILD')")
     @ResponseStatus(HttpStatus.CREATED)
-    public ChoreSubmissionDto submitChore(@PathVariable Long choreId,
-                                          @Valid @RequestBody CreateChoreSubmissionDto request,
-                                          @AuthenticationPrincipal User submitter) {
+    public ChoreDto submitChore(@PathVariable Long choreId,
+                                @Valid @RequestBody CreateChoreSubmissionDto request,
+                                @AuthenticationPrincipal User submitter) {
         Child child = se.gritacademy.backend.security.SecurityUtils.requireChild(submitter);
-        return choreService.submitChore(choreId, request, child);
+        return choreService.submitChoreAndReturnChore(choreId, request, child);
     }
 
     @PatchMapping("/{choreId}/submissions/{submissionId}/approve")

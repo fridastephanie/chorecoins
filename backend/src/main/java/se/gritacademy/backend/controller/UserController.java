@@ -35,6 +35,12 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUserByEmail(@RequestParam String email) {
+        return userService.getUserByEmail(email);
+    }
+
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public UserDto updateUser(@PathVariable Long userId,

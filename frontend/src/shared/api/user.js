@@ -6,6 +6,9 @@ export const registerUser = (data) =>
 export const getUser = (id) => 
   api.get(`/users/${id}`);
 
+export const getUserByEmail = (email) =>
+  api.get(`/users?email=${encodeURIComponent(email)}`);
+
 export const getUserFamilies = (userId) =>
   api.get(`/users/${userId}/families`);
 

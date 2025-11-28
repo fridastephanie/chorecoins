@@ -5,6 +5,7 @@ import Register from "../features/auth/register/Register";
 import Login from "../features/auth/login/Login";
 import Dashboard from "../features/dashboard/Dashboard";
 import EditUser from "../features/editUser/EditUser";
+import FamilyChoreBoard from "../features/familyChoreBoard/FamilyChoreBoard";
 import LoggedInLayout from "../shared/components/Layout/LoggedInLayout";
 import ProtectedRoute from "../shared/routes/ProtectedRoute";
 
@@ -26,6 +27,7 @@ export default function App() {
       >
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/edit-user/:id" element={<EditUser />} />
+        <Route path="/family-choreboard/:id" element={<FamilyChoreBoard />} />
       </Route>
     </Routes>
   );

@@ -48,7 +48,15 @@ public class UserService {
      * Retrieves a specific user by ID.
      */
     public UserDto getUser(Long userId) {
-        User user = getUserOrThrow(userId);
+        User user = getUserByIdOrThrow(userId);
+        return userMapper.toUserDto(user);
+    }
+
+    /**
+     * Retrieves a specific user by email.
+     */
+    public UserDto getUserByEmail(String email) {
+        User user = getUserByEmailOrThrow(email);
         return userMapper.toUserDto(user);
     }
 
@@ -57,7 +65,7 @@ public class UserService {
      * Only allowed if the actor is the same user.
      */
     public UserDto updateUser(Long userId, UpdateUserRequestDto request, User actor) {
-        User targetUser = getUserOrThrow(userId);
+        User targetUser = getUserByIdOrThrow(userId);
         checkModifyPermission(actor, targetUser);
         updateFirstName(targetUser, request.getFirstName());
         updateEmail(targetUser, request.getEmail());
@@ -71,7 +79,7 @@ public class UserService {
      * Only allowed if the actor is the same user.
      */
     public void deleteUser(Long userId, User actor) {
-        User user = getUserOrThrow(userId);
+        User user = getUserByIdOrThrow(userId);
         checkModifyPermission(actor, user);
         removeUserFromFamilies(user);
         userRepository.delete(user);
@@ -81,7 +89,7 @@ public class UserService {
      * Retrieves all families a user belongs to.
      */
     public List<FamilyDto> getUserFamilies(Long userId, User actor) {
-        User user = getUserOrThrow(userId);
+        User user = getUserByIdOrThrow(userId);
         checkViewPermission(actor, user);
         return mapFamiliesToDto(user);
     }
@@ -162,8 +170,17 @@ public class UserService {
     /**
      * HELPER: Retrieves a user by ID or throws 404.
      */
-    private User getUserOrThrow(Long userId) {
+    private User getUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    /**
+     * HELPER: Retrieves a user by email or throws 404.
+     */
+    private User getUserByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }

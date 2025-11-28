@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import useFamilies from "./hooks/useFamilies";
 import NewFamilyModal from "./components/NewFamilyModal";
 import ErrorBanner from "../../shared/components/errorBanner/ErrorBanner";
@@ -38,7 +39,7 @@ export default function Dashboard() {
       <ul className="family-list">
         {families.map((f) => (
           <li key={f.id}>
-            <a href={`/family/${f.id}`}>{f.familyName}</a>
+            <Link to={`/family-choreboard/${f.id}`}>{f.familyName}</Link>
           </li>
         ))}
       </ul>

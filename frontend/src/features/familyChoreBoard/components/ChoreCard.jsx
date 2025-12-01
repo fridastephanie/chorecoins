@@ -1,5 +1,14 @@
-export default function ChoreCard({ chore, currentUser, onSubmit, onViewHistory }) {
-  const isChildAssigned = currentUser.role === "CHILD" && chore.assignedTo?.id === currentUser.id;
+export default function ChoreCard({
+  chore,
+  currentUser,
+  onSubmit,
+  onViewHistory,
+  onDeleteChore,
+}) {
+  const isChildAssigned =
+    currentUser.role === "CHILD" &&
+    chore.assignedTo?.id === currentUser.id;
+
   const isParent = currentUser.role === "PARENT";
 
   return (
@@ -11,13 +20,29 @@ export default function ChoreCard({ chore, currentUser, onSubmit, onViewHistory 
       <p>Status: {chore.status}</p>
 
       <div className="chore-actions">
-        {/* Childs "Submit" button for NOT_STARTED */}
+
+        {/* Child submit button */}
         {isChildAssigned && chore.status === "NOT_STARTED" && (
           <button onClick={() => onSubmit(chore)}>Submit</button>
         )}
 
-        {/* History button always visible */}
+        {/* Always visible */}
         <button onClick={() => onViewHistory(chore)}>History</button>
+
+        {/* Parent-specific VIEW button on DONE */}
+        {isParent && chore.status === "DONE" && (
+          <button onClick={() => onViewHistory(chore)}>View</button>
+        )}
+
+        {/* Parent delete chore button */}
+        {isParent && (
+          <button
+            className="danger"
+            onClick={() => onDeleteChore(chore.id)}
+          >
+            Remove Chore
+          </button>
+        )}
       </div>
     </div>
   );

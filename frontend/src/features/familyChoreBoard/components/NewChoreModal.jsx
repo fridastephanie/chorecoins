@@ -64,6 +64,7 @@ export default function NewChoreModal({ family, onClose, onChoreCreated }) {
           onChange={(e) => setDueDate(e.target.value)}
         />
         <select
+          required
           value={assignedChildId}
           onChange={(e) => setAssignedChildId((e.target.value))}
         >

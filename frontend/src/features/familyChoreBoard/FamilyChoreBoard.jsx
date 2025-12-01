@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
 import { useFamilyApi } from "../../shared/hooks/useFamilyApi";
 import { useChoreApi } from "../../shared/hooks/useChoreApi";
+import useFamilies from "../dashboard/hooks/useFamilies";
+import { useFamilyChores } from "./hooks/useFamilyChores";
 
 import FamilyHeader from "./components/FamilyHeader";
 import ChoreFilter from "./components/ChoreFilter";
@@ -13,71 +15,108 @@ import ChoreSubmissionModal from "./components/ChoreSubmissionModal";
 import ChoreHistoryModal from "./components/ChoreHistoryModal";
 
 export default function FamilyChoreBoard() {
+  /**
+   * Retrieves the family ID from the current route parameters.
+   */
   const { id: familyId } = useParams();
+
+  /**
+   * Hook for programmatic navigation between routes.
+   */
+  const navigate = useNavigate();
+
+  /**
+   * Retrieves the currently logged-in user from context.
+   */
   const { user: currentUser } = useAuth();
-  const { fetchFamilyApi } = useFamilyApi();
-  const { fetchChoresForFamily, handleSubmitChoreAndReturnChore } = useChoreApi();
-  const [family, setFamily] = useState(null);
-  const [chores, setChores] = useState([]);
+
+  /**
+   * Custom hook for updating family list in dashboard.
+   */
+  const { removeFamily } = useFamilies(currentUser?.id);
+
+  const { removeFamilyMemberApi, deleteFamilyApi } = useFamilyApi();
+  const { handleSubmitChoreAndReturnChore, handleDeleteChore } = useChoreApi();
+
+  /**
+   * Custom hook to fetch family details and chores.
+   * Provides `family` object, `chores` array, `loading` state, and `reload` function.
+   */
+  const { family, chores, loading, reload } = useFamilyChores(familyId, currentUser);
+
+  // State for filtering chores by child
   const [filterChildId, setFilterChildId] = useState(null);
+
+  // Modal visibility states
   const [newChoreModalOpen, setNewChoreModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [submissionModalData, setSubmissionModalData] = useState(null);
   const [historyModalData, setHistoryModalData] = useState(null);
 
+  if (!currentUser) return <p>Loading user...</p>;
+  if (loading) return <p>Loading family data...</p>;
+
   /**
-   * Fetches family and chores data for the current family.
-   * Runs whenever the familyId or currentUser changes.
+   * Returns the list of chores, optionally filtered by selected child.
    */
-  useEffect(() => {
-    if (!familyId || !currentUser) return;
-
-    const loadFamilyAndChores = async () => {
-      try {
-        const familyData = await fetchFamilyApi(familyId);
-        setFamily(familyData);
-
-        const choresData = await fetchChoresForFamily(familyId);
-        setChores(choresData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    loadFamilyAndChores();
-  }, [familyId, currentUser, fetchFamilyApi, fetchChoresForFamily]);
-
-  // Filters chores by the selected child if any filter is applied.
   const filteredChores = filterChildId
     ? chores.filter((c) => c.assignedTo?.id === filterChildId)
     : chores;
 
-  // Columns for displaying chore status.
   const columns = [
     { status: "NOT_STARTED", title: "Not Started" },
     { status: "DONE", title: "Submitted" },
     { status: "APPROVED", title: "Approved" },
   ];
 
-  if (!currentUser) return <p>Loading user...</p>;
+  /**
+   * Removes a member from the family and reloads the family and chore data.
+   */
+  const handleRemoveMember = async (memberId) => {
+    await removeFamilyMemberApi(familyId, memberId);
+    await reload(); 
+  };
+
+  /**
+   * Deletes the entire family and updates the dashboard.
+   */
+  const handleDeleteFamily = async () => {
+    await deleteFamilyApi(familyId);
+    removeFamily(Number(familyId));
+    navigate("/dashboard");
+  };
+
+  /**
+   * Deletes a chore and reloads family chores.
+   */
+  const handleDeleteChoreLocal = async (choreId) => {
+    await handleDeleteChore(choreId);
+    await reload();
+  };
 
   return (
     <div className="family-choreboard">
-      {family && currentUser && (
+
+      {/* Family header with actions */}
+      {family && (
         <FamilyHeader
           family={family}
           currentUser={currentUser}
           onAddChore={() => setNewChoreModalOpen(true)}
           onAddMember={() => setAddMemberModalOpen(true)}
+          onRemoveMember={handleRemoveMember}
+          onDeleteFamily={handleDeleteFamily}
         />
       )}
 
+      {/* Filter chores by child */}
       <ChoreFilter
-        childrenList={family?.members?.filter(m => m.role === "CHILD") || []}
+        childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
         filterChildId={filterChildId}
         setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
       />
 
+      {/* Chore columns by status */}
       {columns.map((col) => (
         <ChoreColumn
           key={col.status}
@@ -86,45 +125,35 @@ export default function FamilyChoreBoard() {
           currentUser={currentUser}
           onSubmit={(chore) => setSubmissionModalData(chore)}
           onViewHistory={(chore) => setHistoryModalData(chore)}
+          onDeleteChore={handleDeleteChoreLocal}
         />
       ))}
 
-      {/* Modal for creating a new chore */}
+      {/* Modals */}
       {newChoreModalOpen && (
         <NewChoreModal
           family={family}
           onClose={() => setNewChoreModalOpen(false)}
-          onChoreCreated={(newChore) => setChores((prev) => [...prev, newChore])}
+          onChoreCreated={async () => await reload()}
         />
       )}
 
-      {/* Modal for adding a new family member */}
       {addMemberModalOpen && (
         <AddFamilyMemberModal
           family={family}
           onClose={() => setAddMemberModalOpen(false)}
-          onMemberAdded={(newMember) =>
-            setFamily((prev) => ({ ...prev, members: [...prev.members, newMember] }))
-          }
+          onMemberAdded={async () => await reload()}
         />
       )}
 
-      {/* Modal for submitting a chore */}
       {submissionModalData && (
         <ChoreSubmissionModal
           chore={submissionModalData}
           onClose={() => setSubmissionModalData(null)}
-          onSubmit={async (payload) => {
-            const updatedChore = await handleSubmitChoreAndReturnChore(submissionModalData.id, payload);
-            setChores((prev) =>
-              prev.map((c) => (c.id === updatedChore.id ? updatedChore : c))
-            );
-            setSubmissionModalData(null);
-          }}
+          onSubmit={async () => await reload()}
         />
       )}
 
-      {/* Modal for viewing chore history */}
       {historyModalData && (
         <ChoreHistoryModal
           chore={historyModalData}

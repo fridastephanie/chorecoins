@@ -5,12 +5,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import se.gritacademy.backend.dto.family.CreateFamilyRequestDto;
 import se.gritacademy.backend.dto.family.FamilyDto;
+import se.gritacademy.backend.entity.chore.Chore;
 import se.gritacademy.backend.entity.family.Family;
+import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.mapper.FamilyMapper;
 import se.gritacademy.backend.repository.FamilyRepository;
 import se.gritacademy.backend.repository.UserRepository;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FamilyService {
@@ -55,8 +60,13 @@ public class FamilyService {
     public FamilyDto removeMember(Long familyId, Long userId, Parent actor) {
         Family family = getFamilyOrThrow(familyId);
         verifyFamilyMember(family, actor);
-
         User user = getUserOrThrow(userId);
+
+        if (user instanceof Child child) {
+            Set<Chore> choresToRemove = getChoresToRemove(child, familyId);
+            removeChoresFromChildAndFamily(choresToRemove, child, family);
+        }
+
         if (!family.getMembers().remove(user)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of this family");
         }
@@ -128,5 +138,24 @@ public class FamilyService {
     private FamilyDto saveAndMap(Family family) {
         family = familyRepository.save(family);
         return familyMapper.toFamilyDto(family);
+    }
+
+    /**
+     * HELPER: Get all chores assigned to a child in a specific family.
+     */
+    private Set<Chore> getChoresToRemove(Child child, Long familyId) {
+        return child.getChores().stream()
+                .filter(chore -> chore.getFamily().getId().equals(familyId))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * HELPER: Remove chores from child and family.
+     */
+    private void removeChoresFromChildAndFamily(Set<Chore> chores, Child child, Family family) {
+        chores.forEach(chore -> {
+            child.getChores().remove(chore);
+            family.getChores().remove(chore);
+        });
     }
 }

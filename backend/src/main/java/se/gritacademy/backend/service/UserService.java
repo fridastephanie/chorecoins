@@ -11,6 +11,7 @@ import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.mapper.FamilyMapper;
 import se.gritacademy.backend.mapper.UserMapper;
+import se.gritacademy.backend.repository.FamilyRepository;
 import se.gritacademy.backend.repository.UserRepository;
 
 import java.util.List;
@@ -20,14 +21,16 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FamilyRepository familyRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final FamilyMapper familyMapper;
 
-    public UserService(UserRepository userRepository,
+    public UserService(UserRepository userRepository, FamilyRepository familyRepository,
                        PasswordEncoder passwordEncoder,
                        UserMapper userMapper, FamilyMapper familyMapper) {
         this.userRepository = userRepository;
+        this.familyRepository = familyRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.familyMapper = familyMapper;
@@ -206,7 +209,8 @@ public class UserService {
      * HELPER: Maps all families to FamilyDto
      */
     private List<FamilyDto> mapFamiliesToDto(User user) {
-        return user.getFamilies().stream()
+        return familyRepository.findAllByMembers_Id(user.getId())
+                .stream()
                 .map(familyMapper::toFamilyDto)
                 .collect(Collectors.toList());
     }

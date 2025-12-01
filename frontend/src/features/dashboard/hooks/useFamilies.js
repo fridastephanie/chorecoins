@@ -33,7 +33,6 @@ export default function useFamilies(userId) {
   /**
    * Adds a new family to the existing families state.
    * Updates both local state and the in-memory cache.
-   * @param {Object} family - The new family object to add
    */
   const addFamily = (family) => {
     setFamilies((prev) => {
@@ -43,9 +42,22 @@ export default function useFamilies(userId) {
     });
   };
 
+  /**
+   * Removes a family from the existing families state.
+   * Updates both local state and the in-memory cache.
+   */
+  const removeFamily = (familyId) => {
+  setFamilies((prev) => {
+    const updated = prev.filter((f) => f.id !== familyId);
+    familyCache[userId] = updated; 
+    return updated;
+  });
+};
+
   return {
     families,
     error,
     addFamily,
+    removeFamily
   };
 }

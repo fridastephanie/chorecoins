@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import se.gritacademy.backend.entity.chore.Chore;
 import se.gritacademy.backend.entity.user.User;
 
 import java.util.HashSet;
@@ -33,4 +34,6 @@ public class Family {
     )
     private Set<User> members = new HashSet<>();
 
+    @OneToMany(mappedBy = "family", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Chore> chores = new HashSet<>();
 }

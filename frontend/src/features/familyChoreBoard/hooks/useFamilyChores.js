@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useChoreApi } from "../../shared/api/useChoreApi";
-import { useFamilyApi } from "../../shared/api/useFamilyApi";
+import { useChoreApi } from "../../../shared/hooks/useChoreApi";
+import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
 
 export const useFamilyChores = (familyId, currentUser) => {
-  const { getChoresForFamily, getChoresForChild } = useChoreApi();
-  const { getFamily } = useFamilyApi();
+  const { fetchChoresForFamily, fetchChoresForChild } = useChoreApi();
+  const { fetchFamilyApi } = useFamilyApi();
   const [family, setFamily] = useState(null);
   const [chores, setChores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +16,12 @@ export const useFamilyChores = (familyId, currentUser) => {
    */
   const loadData = async () => {
     setLoading(true);
-    const familyData = await getFamily(familyId);
+    const familyData = await fetchFamilyApi(familyId);
     let choresData;
     if (filterOwn && currentUser.role === "CHILD") {
-      choresData = await getChoresForChild(currentUser.id);
+      choresData = await fetchChoresForChild(currentUser.id);
     } else {
-      choresData = await getChoresForFamily(familyId);
+      choresData = await fetchChoresForFamily(familyId);
     }
     setFamily(familyData);
     setChores(choresData);

@@ -32,7 +32,7 @@ public class ChoreSubmission {
     private Set<String> imageUrls = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "chore_id")
+    @JoinColumn(name = "chore_id", nullable = false)
     private Chore chore;
 
     @ManyToOne

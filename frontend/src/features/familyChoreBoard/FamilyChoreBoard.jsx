@@ -13,6 +13,7 @@ import NewChoreModal from "./components/NewChoreModal";
 import AddFamilyMemberModal from "./components/AddFamilyMemberModal";
 import ChoreSubmissionModal from "./components/ChoreSubmissionModal";
 import ChoreHistoryModal from "./components/ChoreHistoryModal";
+import ViewSubmissionModal from "./components/ViewSubmissionModal";
 
 export default function FamilyChoreBoard() {
   /**
@@ -36,7 +37,7 @@ export default function FamilyChoreBoard() {
   const { removeFamily } = useFamilies(currentUser?.id);
 
   const { removeFamilyMemberApi, deleteFamilyApi } = useFamilyApi();
-  const { handleSubmitChoreAndReturnChore, handleDeleteChore } = useChoreApi();
+  const { handleDeleteChore, approveChoreSubmission, rejectChoreSubmission } = useChoreApi();
 
   /**
    * Custom hook to fetch family details and chores.
@@ -52,6 +53,14 @@ export default function FamilyChoreBoard() {
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [submissionModalData, setSubmissionModalData] = useState(null);
   const [historyModalData, setHistoryModalData] = useState(null);
+
+  /**
+   * State for parent view of a child's submission.
+   * Used to open ViewSubmissionModal where parent can approve or reject.
+   *
+   * NOTE: this stores an object { chore, submission }
+   */
+  const [viewSubmissionData, setViewSubmissionData] = useState(null);
 
   if (!currentUser) return <p>Loading user...</p>;
   if (loading) return <p>Loading family data...</p>;
@@ -126,6 +135,8 @@ export default function FamilyChoreBoard() {
           onSubmit={(chore) => setSubmissionModalData(chore)}
           onViewHistory={(chore) => setHistoryModalData(chore)}
           onDeleteChore={handleDeleteChoreLocal}
+          // pass handler that receives { chore, submission } from ChoreCard
+          onViewSubmission={(data) => setViewSubmissionData(data)}
         />
       ))}
 
@@ -158,6 +169,38 @@ export default function FamilyChoreBoard() {
         <ChoreHistoryModal
           chore={historyModalData}
           onClose={() => setHistoryModalData(null)}
+        />
+      )}
+
+      {/* ViewSubmissionModal for parent to approve/reject latest submission */}
+      {viewSubmissionData && (
+        <ViewSubmissionModal
+            chore={viewSubmissionData.chore}
+            submission={viewSubmissionData.submission}
+            onClose={() => setViewSubmissionData(null)}
+            onDecision={async (decision, comment, submission) => {
+                // decision = "APPROVE" | "REJECT"
+                try {
+                if (decision === "APPROVE") {
+                    await approveChoreSubmission(
+                    viewSubmissionData.chore.id,
+                    submission.id,
+                    comment
+                    );
+                } else if (decision === "REJECT") {
+                    await rejectChoreSubmission(
+                    viewSubmissionData.chore.id,
+                    submission.id,
+                    comment
+                    );
+                }
+                await reload();
+                } catch (err) {
+                console.error("Error updating submission:", err);
+                } finally {
+                setViewSubmissionData(null);
+                }
+            }}
         />
       )}
     </div>

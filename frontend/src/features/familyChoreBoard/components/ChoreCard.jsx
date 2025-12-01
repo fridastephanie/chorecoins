@@ -4,12 +4,15 @@ export default function ChoreCard({
   onSubmit,
   onViewHistory,
   onDeleteChore,
+  onViewSubmission,
 }) {
   const isChildAssigned =
     currentUser.role === "CHILD" &&
     chore.assignedTo?.id === currentUser.id;
 
   const isParent = currentUser.role === "PARENT";
+  const hasSubmissions = chore.submissions && chore.submissions.length > 0;
+  const latestSubmission = hasSubmissions ? chore.submissions[chore.submissions.length - 1] : null;
 
   return (
     <div className="chore-card">
@@ -26,12 +29,17 @@ export default function ChoreCard({
           <button onClick={() => onSubmit(chore)}>Submit</button>
         )}
 
-        {/* Always visible */}
-        <button onClick={() => onViewHistory(chore)}>History</button>
+        {/* History button only if there are submissions */}
+        {hasSubmissions && (
+          <button onClick={() => onViewHistory(chore)}>History</button>
+        )}
 
         {/* Parent-specific VIEW button on DONE */}
-        {isParent && chore.status === "DONE" && (
-          <button onClick={() => onViewHistory(chore)}>View</button>
+        {isParent && chore.status === "DONE" && hasSubmissions && (
+          // Send both chore and the latest submission to parent handler
+          <button onClick={() => onViewSubmission({ chore, submission: latestSubmission })}>
+            View
+          </button>
         )}
 
         {/* Parent delete chore button */}

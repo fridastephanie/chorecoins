@@ -117,8 +117,8 @@ public class ChoreService {
     public ChoreSubmissionDto approveSubmission(Long choreId, Long submissionId, Parent approver, String parentComment) {
         Chore chore = getChoreOrThrow(choreId);
         ChoreSubmission submission = getSubmissionOrThrow(submissionId);
-        verifyFamilyMember(chore.getFamily(), approver);
         verifySubmissionBelongsToChore(submission, chore);
+        verifyFamilyMember(chore.getFamily(), approver);
         ensureChoreNotAlreadyApproved(chore);
         updateSubmissionApproval(submission, true, parentComment);
         updateChoreStatus(chore, ChoreStatus.APPROVED);
@@ -132,6 +132,7 @@ public class ChoreService {
     public ChoreSubmissionDto rejectSubmission(Long choreId, Long submissionId, Parent approver, String reason) {
         Chore chore = getChoreOrThrow(choreId);
         ChoreSubmission submission = getSubmissionOrThrow(submissionId);
+        verifySubmissionBelongsToChore(submission, chore);
         verifyFamilyMember(chore.getFamily(), approver);
         updateSubmissionApproval(submission, false, reason);
         updateChoreStatus(chore, ChoreStatus.NOT_STARTED);

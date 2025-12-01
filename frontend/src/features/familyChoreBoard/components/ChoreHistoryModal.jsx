@@ -1,9 +1,13 @@
 import Modal from "../../../shared/components/modal/Modal";
 
 export default function ChoreHistoryModal({ chore, onClose }) {
+  const sortedSubmissions = [...(chore.submissions || [])].sort(
+    (a, b) => a.id - b.id
+  );
+
   return (
     <Modal title={`History for: ${chore.title}`} onClose={onClose}>
-      {chore.submissions?.map((sub) => (
+      {sortedSubmissions.map((sub) => (
         <div key={sub.id} className="submission-history">
           <p><strong>Child comment:</strong> {sub.commentChild || "—"}</p>
           {sub.imageUrls?.length > 0 && (

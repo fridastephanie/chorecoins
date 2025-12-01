@@ -7,6 +7,7 @@ export default function ChoreColumn({
   onSubmit,
   onViewHistory,
   onDeleteChore,
+  onViewSubmission,
 }) {
   return (
     <div className="chore-column">
@@ -20,6 +21,7 @@ export default function ChoreColumn({
           onSubmit={onSubmit}
           onViewHistory={onViewHistory}
           onDeleteChore={onDeleteChore}
+          onViewSubmission={onViewSubmission} 
         />
       ))}
     </div>

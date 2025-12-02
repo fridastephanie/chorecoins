@@ -3,6 +3,7 @@ package se.gritacademy.backend.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 import se.gritacademy.backend.dto.chore.*;
 import se.gritacademy.backend.dto.weeklychildstats.CreateWeeklyChildStatsRequestDto;
 import se.gritacademy.backend.entity.chore.*;
@@ -19,7 +20,9 @@ import se.gritacademy.backend.repository.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ChoreService {
@@ -31,6 +34,7 @@ public class ChoreService {
     private final WeeklyChildStatsRepository weeklyChildStatsRepository;
     private final ChoreMapper choreMapper;
     private final ChoreSubmissionMapper submissionMapper;
+    private final SupabaseStorageService supabaseStorageService;
 
     public ChoreService(ChoreRepository choreRepository,
                         ChoreSubmissionRepository submissionRepository,
@@ -38,7 +42,7 @@ public class ChoreService {
                         UserRepository userRepository,
                         WeeklyChildStatsRepository weeklyChildStatsRepository,
                         ChoreMapper choreMapper,
-                        ChoreSubmissionMapper submissionMapper) {
+                        ChoreSubmissionMapper submissionMapper, SupabaseStorageService supabaseStorageService) {
         this.choreRepository = choreRepository;
         this.submissionRepository = submissionRepository;
         this.familyRepository = familyRepository;
@@ -46,6 +50,7 @@ public class ChoreService {
         this.weeklyChildStatsRepository = weeklyChildStatsRepository;
         this.choreMapper = choreMapper;
         this.submissionMapper = submissionMapper;
+        this.supabaseStorageService = supabaseStorageService;
     }
 
     /**
@@ -99,6 +104,22 @@ public class ChoreService {
         Child child = ensureChild(user);
         updateChoreAssignment(chore, child, ChoreStatus.NOT_STARTED);
         return choreMapper.toDto(chore);
+    }
+
+    /**
+     * Submit a chore with an optional file, creating a submission entity and marking the chore DONE.
+     */
+    public ChoreDto submitChoreWithFile(Long choreId, String commentChild, MultipartFile file, Child submitter) {
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            imageUrl = supabaseStorageService.uploadFile(file);
+        }
+
+        CreateChoreSubmissionDto request = new CreateChoreSubmissionDto();
+        request.setCommentChild(commentChild);
+        setImageUrlsFromSingle(request, imageUrl);
+
+        return submitChoreAndReturnChore(choreId, request, submitter);
     }
 
     /**
@@ -281,6 +302,18 @@ public class ChoreService {
     private void ensureChoreNotAlreadyApproved(Chore chore) {
         if (chore.getStatus() == ChoreStatus.APPROVED) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chore is already approved");
+        }
+    }
+
+    /**
+     * HELPER: Set image URLs on a submission DTO.
+     * Converts a single image URL to a Set, or sets an empty Set if null.
+     */
+    private void setImageUrlsFromSingle(CreateChoreSubmissionDto request, String imageUrl) {
+        if (imageUrl != null) {
+            request.setImageUrls(Set.of(imageUrl));
+        } else {
+            request.setImageUrls(Collections.emptySet());
         }
     }
 

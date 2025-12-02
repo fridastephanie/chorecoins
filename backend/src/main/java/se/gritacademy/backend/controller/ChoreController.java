@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import se.gritacademy.backend.dto.chore.*;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
@@ -67,11 +68,14 @@ public class ChoreController {
     @PostMapping("/{choreId}/submit")
     @PreAuthorize("hasRole('CHILD')")
     @ResponseStatus(HttpStatus.CREATED)
-    public ChoreDto submitChore(@PathVariable Long choreId,
-                                @Valid @RequestBody CreateChoreSubmissionDto request,
-                                @AuthenticationPrincipal User submitter) {
+    public ChoreDto submitChore(
+            @PathVariable Long choreId,
+            @RequestParam("commentChild") String commentChild,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal User submitter) {
+
         Child child = se.gritacademy.backend.security.SecurityUtils.requireChild(submitter);
-        return choreService.submitChoreAndReturnChore(choreId, request, child);
+        return choreService.submitChoreWithFile(choreId, commentChild, file, child);
     }
 
     @PatchMapping("/{choreId}/submissions/{submissionId}/approve")

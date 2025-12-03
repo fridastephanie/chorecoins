@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function HeroButtons() {
+export default function AuthButtons() {
   const navigate = useNavigate();
 
   return (

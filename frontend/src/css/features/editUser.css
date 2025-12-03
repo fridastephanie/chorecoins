@@ -1,0 +1,44 @@
+.edit-user-container form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px; 
+  margin: 0 auto;
+}
+
+.edit-user-container h1 {
+  justify-self: center;
+  margin-bottom: 1.2rem;
+}
+
+.edit-user-container form > div {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.edit-user-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  margin-top: 1rem;
+}
+
+.delete-btn {
+  color: red;
+}
+
+/* iPad */
+@media (min-width: 768px) {
+  .edit-user-container form {
+    max-width: 400px; 
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .edit-user-container form {
+    max-width: 500px; 
+  }
+}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useChoreApi } from "../../../shared/hooks/useChoreApi";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 
 export default function ChoreSubmissionModal({ chore, onClose, onSubmit }) {
   const { handleSubmitChoreAndReturnChore } = useChoreApi();
@@ -9,11 +9,6 @@ export default function ChoreSubmissionModal({ chore, onClose, onSubmit }) {
   const [error, setError] = useState(null);
 
 
-  /**
-  * Submits the chore with optional comment and image.
-  * Calls API, updates parent via onSubmit, and closes the modal.
-  * Sets an error message if submission fails.
-  */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

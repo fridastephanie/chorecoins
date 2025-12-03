@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../shared/components/InputField";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 import { useError } from "../../../shared/context/ErrorContext";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useEditUserForm } from "../hooks/useEditUserForm";
@@ -88,33 +88,27 @@ export default function EditUserForm() {
           placeholder="Your email"
         />
         <InputField
-          label="New Password"
-          name="password"
-          type="password"
-          value={values.password}
-          onChange={handleChange}
-          error={errors.password && Array.isArray(errors.password) ? errors.password.join(", ") : errors.password}
-          placeholder="Leave empty if unchanged"
+            label="New Password"
+            name="password"
+            type="password"
+            value={values.password}
+            onChange={handleChange}
+            error={errors.password} 
+            placeholder="Leave empty if unchanged"
         />
         <InputField
-          label="Confirm New Password"
-          name="confirmPassword"
-          type="password"
-          value={values.confirmPassword}
-          onChange={handleChange}
-          error={errors.confirmPassword}
-          placeholder="Confirm new password"
+            label="Confirm New Password"
+            name="confirmPassword"
+            type="password"
+            value={values.confirmPassword}
+            onChange={handleChange}
+            error={errors.confirmPassword} 
+            placeholder="Confirm new password"
         />
-
-        <button type="submit" disabled={loading}>Update User</button>
-        <button
-          type="button"
-          onClick={handleDeleteClick}
-          style={{ marginLeft: "10px", color: "red" }}
-          disabled={loading}
-        >
-          Delete Account
-        </button>
+        <div className="edit-user-buttons">
+            <button type="submit" disabled={loading}>Update User</button>
+            <button type="button" onClick={handleDeleteClick} disabled={loading} className="delete-btn">Delete Account</button>
+        </div>
       </form>
 
       {/* Delete confirmation modal */}
@@ -124,7 +118,7 @@ export default function EditUserForm() {
           onClose={() => setShowDeleteModal(false)}
         >
           <p>Are you sure you want to delete your account? This cannot be undone.</p>
-          <button onClick={confirmDelete} style={{ marginRight: "10px", color: "red" }}>Yes, Delete</button>
+          <button onClick={confirmDelete} className="delete-btn">Yes, Delete</button>
           <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
         </Modal>
       )}

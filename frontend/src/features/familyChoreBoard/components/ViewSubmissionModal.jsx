@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 
 export default function ViewSubmissionModal({ chore, submission, onClose, onDecision }) {
 
@@ -7,10 +7,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
   const [comment, setComment] = useState(""); 
   const [error, setError] = useState(null);   
 
-  /**
-   * Handles approving the submission.
-   * Requires a non-empty comment.
-   */
   const handleApprove = () => {
     if (!comment.trim()) {
       setError("Comment is required.");
@@ -20,10 +16,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
     onClose();
   };
 
-  /**
-   * Handles rejecting the submission.
-   * Requires a non-empty comment.
-   */
   const handleReject = () => {
     if (!comment.trim()) {
       setError("Comment is required.");
@@ -33,7 +25,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
     onClose();
   };
 
-  // If no submission is available, show a message in a modal
   if (!latestSubmission) {
     return (
       <Modal title="No submission found" onClose={onClose}>
@@ -46,7 +37,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
     <Modal title={`Submission for ${chore?.title || "chore"}`} onClose={onClose}>
       {error && <p className="error">{error}</p>}
 
-      {/* Display submission details */}
       <div>
         <p>
           <strong>Submitted at:</strong>{" "}
@@ -60,7 +50,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
         </p>
       </div>
 
-      {/* Input for parent comment */}
       <div>
         <label>
           Parent comment (required):
@@ -72,7 +61,6 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
         </label>
       </div>
 
-      {/* Action buttons */}
       <div className="modal-actions">
         <button onClick={handleApprove}>Approve</button>
         <button className="danger" onClick={handleReject}>Reject</button>

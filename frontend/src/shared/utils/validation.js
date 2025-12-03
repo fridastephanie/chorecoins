@@ -1,24 +1,28 @@
 export const validateFirstName = (name) => {
-  if (!name) return "First name is required";
-  return "";
+  const nameRegex = /^[A-Z][a-z]+$/;
+  return [
+    { text: "First letter uppercase, letters only", isValid: nameRegex.test(name) }
+  ];
 };
 
 export const validateEmail = (email) => {
-  if (!email) return "Email is required";
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) return "Invalid email format";
-  return "";
+  return [
+    { text: "Must include @ and .", isValid: emailRegex.test(email) }
+  ];
 };
 
 export const validatePassword = (password) => {
-  const errors = [];
-  if (password.length < 6) errors.push("At least 6 characters");
-  if (!/[A-Z]/.test(password)) errors.push("At least one uppercase letter");
-  if (!/[0-9]/.test(password)) errors.push("At least one number");
-  return errors;
+  return [
+    { text: "Min 6 characters", isValid: password.length >= 6 },
+    { text: "Include 1 uppercase letter", isValid: /[A-Z]/.test(password) },
+    { text: "Include 1 number", isValid: /[0-9]/.test(password) }
+  ];
 };
 
 export const validateConfirmPassword = (password, confirmPassword) => {
-  if (password !== confirmPassword) return "Passwords do not match";
-  return "";
+  if (!confirmPassword) return []; 
+  return [
+    { text: "Passwords must match", isValid: password === confirmPassword }
+  ];
 };

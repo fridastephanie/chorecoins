@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 import { useError } from "../../../shared/context/ErrorContext";
 import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
 

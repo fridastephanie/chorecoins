@@ -1,5 +1,5 @@
-import { useError } from "../../context/ErrorContext";
-import "./css/errorBanner.css";
+import { useError } from "../context/ErrorContext";
+import "../../css/shared/errorBanner.css";
 
 export default function ErrorBanner() {
   const { error, clearError } = useError();

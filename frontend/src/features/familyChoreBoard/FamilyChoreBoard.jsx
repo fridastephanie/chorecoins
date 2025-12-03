@@ -14,38 +14,17 @@ import AddFamilyMemberModal from "./components/AddFamilyMemberModal";
 import ChoreSubmissionModal from "./components/ChoreSubmissionModal";
 import ChoreHistoryModal from "./components/ChoreHistoryModal";
 import ViewSubmissionModal from "./components/ViewSubmissionModal";
+import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 
 export default function FamilyChoreBoard() {
-  /**
-   * Retrieves the family ID from the current route parameters.
-   */
+  useDocumentTitle("Family Chore Board");  
   const { id: familyId } = useParams();
-
-  /**
-   * Hook for programmatic navigation between routes.
-   */
   const navigate = useNavigate();
-
-  /**
-   * Retrieves the currently logged-in user from context.
-   */
   const { user: currentUser } = useAuth();
-
-  /**
-   * Custom hook for updating family list in dashboard.
-   */
   const { removeFamily } = useFamilies(currentUser?.id);
-
   const { removeFamilyMemberApi, deleteFamilyApi } = useFamilyApi();
   const { handleDeleteChore, approveChoreSubmission, rejectChoreSubmission } = useChoreApi();
-
-  /**
-   * Custom hook to fetch family details and chores.
-   * Provides `family` object, `chores` array, `loading` state, and `reload` function.
-   */
   const { family, chores, loading, reload } = useFamilyChores(familyId, currentUser);
-
-  // State for filtering chores by child
   const [filterChildId, setFilterChildId] = useState(null);
 
   // Modal visibility states
@@ -135,7 +114,6 @@ export default function FamilyChoreBoard() {
           onSubmit={(chore) => setSubmissionModalData(chore)}
           onViewHistory={(chore) => setHistoryModalData(chore)}
           onDeleteChore={handleDeleteChoreLocal}
-          // pass handler that receives { chore, submission } from ChoreCard
           onViewSubmission={(data) => setViewSubmissionData(data)}
         />
       ))}

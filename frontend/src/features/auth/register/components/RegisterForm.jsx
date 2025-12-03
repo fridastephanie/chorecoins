@@ -2,6 +2,7 @@ import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
 import { useUserApi } from "../../../../shared/hooks/useUserApi";
+import InputField from "../../../../shared/components/InputField";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -34,80 +35,70 @@ export default function RegisterForm() {
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>
-      <div>
-        <input
-          name="firstName"
-          placeholder="First name"
-          value={form.firstName}
-          onChange={handleChange}
-          required
-        />
-        {errors.firstName && <p className="field-error">{errors.firstName}</p>}
-      </div>
-
-      <div>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        {errors.email && <p className="field-error">{errors.email}</p>}
-      </div>
-
-      <div>
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        {errors.password && Array.isArray(errors.password) &&
-          errors.password.map((err, i) => <p key={i} className="field-error">{err}</p>)
-        }
-      </div>
-
-      <div>
-        <input
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm password"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          required
-        />
-        {errors.confirmPassword && <p className="field-error">{errors.confirmPassword}</p>}
-      </div>
-
-      <div className="role-select">
-        <label>
-          <input
-            type="radio"
-            name="role"
-            value="PARENT"
-            checked={form.role === "PARENT"}
+        <InputField
+            required
+            name="firstName"
+            placeholder="First name"
+            value={form.firstName}
             onChange={handleChange}
-          /> Parent
-        </label>
+            error={errors.firstName}
+        />
 
-        <label>
-          <input
-            type="radio"
-            name="role"
-            value="CHILD"
-            checked={form.role === "CHILD"}
+        <InputField
+            required
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
             onChange={handleChange}
-          /> Child
-        </label>
-      </div>
+            error={errors.email}
+        />
 
-      <button type="submit" disabled={loading}>
+        <InputField
+            required
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            error={errors.password}
+        />
+
+        <InputField
+            required
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirm password"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            error={errors.confirmPassword}
+        />
+
+        <div className="role-select">
+            <label>
+            <input
+                type="radio"
+                name="role"
+                value="PARENT"
+                checked={form.role === "PARENT"}
+                onChange={handleChange}
+            /> Parent
+            </label>
+
+            <label>
+            <input
+                type="radio"
+                name="role"
+                value="CHILD"
+                checked={form.role === "CHILD"}
+                onChange={handleChange}
+            /> Child
+            </label>
+        </div>
+
+        <button type="submit" disabled={loading}>
         {loading ? "Registering.." : "Register"}
-      </button>
+        </button>
     </form>
   );
 }

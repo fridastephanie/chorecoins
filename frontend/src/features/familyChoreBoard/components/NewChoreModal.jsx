@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useChoreApi } from "../../../shared/hooks/useChoreApi";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 
 export default function NewChoreModal({ family, onClose, onChoreCreated }) {
   const { createNewChore } = useChoreApi();
@@ -11,11 +11,6 @@ export default function NewChoreModal({ family, onClose, onChoreCreated }) {
   const [assignedChildId, setAssignedChildId] = useState("");
   const [error, setError] = useState(null);
 
-  /**
-  * Creates a new chore with the form data.
-  * Calls API, updates parent via onChoreCreated, and closes the modal.
-  * Sets an error message if creation fails.
-  */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

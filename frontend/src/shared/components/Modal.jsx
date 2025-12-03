@@ -1,4 +1,4 @@
-import "./css/modal.css"; 
+import "../../css/shared/modal.css";
 
 export default function Modal({ title, children, onClose }) {
   return (

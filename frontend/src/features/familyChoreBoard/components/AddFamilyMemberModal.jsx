@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useUserApi } from "../../../shared/hooks/useUserApi";
 import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
-import Modal from "../../../shared/components/modal/Modal";
+import Modal from "../../../shared/components/Modal";
 
 export default function AddFamilyMemberModal({ family, onClose, onMemberAdded }) {
   const { fetchUser } = useUserApi();
@@ -11,11 +11,6 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
   const [foundUser, setFoundUser] = useState(null);
   const [error, setError] = useState(null);
 
-  /**
-   * Searches for a user by email using the useUserApi hook.
-   * If a user is found, updates the `foundUser` state.
-   * If no user is found or the request fails, sets an appropriate error message.
-   */
   const handleSearch = async () => {
     try {
       setError(null);
@@ -27,11 +22,6 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
     }
   };
 
-  /**
-   * Adds the found user to the current family using the useFamilyApi hook.
-   * Calls `onMemberAdded` to update the parent component's state and closes the modal.
-   * If the API call fails, displays an error message.
-   */
   const handleAddMember = async () => {
     if (!foundUser) return;
 
@@ -44,7 +34,6 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
     }
   };
 
-  // Checks if the found user is already a member of the family
   const isAlreadyMember = foundUser && family.members.some(m => m.id === foundUser.id);
 
   return (

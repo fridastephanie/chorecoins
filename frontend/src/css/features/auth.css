@@ -1,0 +1,178 @@
+/* REGISTER */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;              
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.register-container img.register-image {
+  width: 220px;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+
+.register-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--brown);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: var(--shadow);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.register-form > div {
+  margin-bottom: 1rem;         
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.role-select {
+  display: flex;
+  flex-direction: column; 
+  gap: 0.5rem;           
+  margin-bottom: 1rem;
+}
+
+.role-select label {
+  display: flex;
+  align-items: center;     
+  gap: 0.5rem;             
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.role-select input[type="radio"] {
+  width: 1.2rem;           
+  height: 1.2rem;
+  cursor: pointer;
+}
+
+.register-form button {
+  background-color: var(--yellow);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--brown);
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.register-form button:hover:not(:disabled) {
+  background-color: var(--orange);
+  transform: translateY(-2px);
+}
+
+.register-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* iPad */
+@media (min-width: 768px) {
+  .register-container img.register-image {
+  width: 300px;
+  }
+   .role-select {
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 6rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .register-container {
+    max-width: 500px;
+  }
+  .register-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* LOGIN */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;              
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.login-container img.login-image {
+  width: 230px;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--brown);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: var(--shadow);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.login-form > div {
+  margin-bottom: 1rem;         
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.login-form button {
+  background-color: var(--yellow);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--brown);
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.login-form button:hover:not(:disabled) {
+  background-color: var(--orange);
+  transform: translateY(-2px);
+}
+
+/* iPad */
+@media (min-width: 768px) {
+  .login-container img.login-image {
+    width: 340px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .login-container {
+    max-width: 500px;
+  }
+  .login-title {
+    font-size: 2.5rem;
+  }
+}

@@ -3,7 +3,7 @@ import { useForm } from "../../../shared/hooks/useForm";
 import { validateFirstName, validateEmail, validatePassword, validateConfirmPassword } from "../../../shared/utils/validation";
 import { useUserApi } from "../../../shared/hooks/useUserApi";
 
-const userCache = {}; // Simple in-memory cache for user data keyed by userId
+const userCache = {}; //Simple in-memory cache for user data keyed by userId
 
 export function useEditUserForm(user, onDeleteSuccess) {
   const { fetchUser, updateUserData, deleteUserAccount, loading, error } = useUserApi();
@@ -60,7 +60,7 @@ export function useEditUserForm(user, onDeleteSuccess) {
       firstName: validateFirstName(values.firstName),
       email: validateEmail(values.email),
       password: values.password ? validatePassword(values.password) : [],
-      confirmPassword: values.password ? validateConfirmPassword(values.password, values.confirmPassword) : ""
+      confirmPassword: values.password ? validateConfirmPassword(values.password, values.confirmPassword) : []
     });
   }, [values]);
 
@@ -68,7 +68,13 @@ export function useEditUserForm(user, onDeleteSuccess) {
    * Checks if the current form values are valid based on the errors state.
    * Returns true only if all fields pass their respective validation rules.
    */
-  const isValid = () => Object.values(errors).every(err => !err || (Array.isArray(err) && err.length === 0));
+  const isValid = () => {
+    return Object.values(errors).every(err => {
+        if (!err) return true;
+        if (Array.isArray(err)) return err.every(e => e.isValid);
+        return true; 
+    });
+   };
 
   /**
    * Prepares a payload of updated fields and sends it to the backend.

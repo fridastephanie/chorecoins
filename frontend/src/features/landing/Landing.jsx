@@ -16,19 +16,16 @@ export default function Landing() {
       <h1 className="landing-title">Welcome to ChoreCoins!</h1>
       <div className="landing-info">
         <p>
-          ChoreCoins is a fun and easy way for families to manage chores and earn coins. 
-          Parents can create a family account and add members, including children and other parents.
+          ChoreCoins makes it easy for families to manage chores and earn coins. 
+          Parents can create a family, add members, and assign chores with coin values.
         </p>
         <p>
-          Once set up, parents can assign chores to children, each with a specific coin value. 
-          Kids complete their chores and submit them with comments, and parents review the submissions to approve or reject them.
+          Kids complete chores and submit them with comments; parents approve or reject submissions. 
+          Approved chores add coins to the child’s weekly allowance, while rejected chores can be retried.
         </p>
         <p>
-          If a chore is rejected, the child can try again; if approved, the coins are added to the child’s weekly allowance. 
-          The app tracks each child’s completed chores and current coin balance, giving families a clear overview of progress.
-        </p>
-        <p>
-          Weekly coin balances reset every Monday, keeping the system fresh and motivating for the whole family.
+          Each child’s weekly history shows completed chores and earned coins by family. 
+          Weekly coin balances reset and approved chores are automatically cleared every Monday, and overdue not-started chores are removed.
         </p>
       </div>
     </div>

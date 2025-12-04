@@ -14,6 +14,8 @@ import AddFamilyMemberModal from "./components/AddFamilyMemberModal";
 import ChoreSubmissionModal from "./components/ChoreSubmissionModal";
 import ChoreHistoryModal from "./components/ChoreHistoryModal";
 import ViewSubmissionModal from "./components/ViewSubmissionModal";
+import ConfirmModal from "../../shared/components/ConfirmModal";
+import "../../css/features/familyChoreBoard.css";
 import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 
 export default function FamilyChoreBoard() {
@@ -32,14 +34,36 @@ export default function FamilyChoreBoard() {
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [submissionModalData, setSubmissionModalData] = useState(null);
   const [historyModalData, setHistoryModalData] = useState(null);
+  const [viewSubmissionData, setViewSubmissionData] = useState(null);
+
+  // ConfirmModal state
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
 
   /**
-   * State for parent view of a child's submission.
-   * Used to open ViewSubmissionModal where parent can approve or reject.
-   *
-   * NOTE: this stores an object { chore, submission }
+   * Opens the confirm modal with custom title, message, and callback.
+   * The `onConfirm` callback is executed only if the user confirms.
    */
-  const [viewSubmissionData, setViewSubmissionData] = useState(null);
+  const openConfirmModal = ({ title, message, onConfirm }) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmModal({ ...confirmModal, isOpen: false });
+      },
+    });
+  };
+
+  /** Closes the confirm modal without executing the action */
+  const closeConfirmModal = () => {
+    setConfirmModal({ ...confirmModal, isOpen: false });
+  };
 
   if (!currentUser) return <p>Loading user...</p>;
   if (loading) return <p>Loading family data...</p>;
@@ -58,28 +82,49 @@ export default function FamilyChoreBoard() {
   ];
 
   /**
-   * Removes a member from the family and reloads the family and chore data.
+   * Removes a member from the family.
+   * Opens a confirm modal before calling the API.
    */
-  const handleRemoveMember = async (memberId) => {
-    await removeFamilyMemberApi(familyId, memberId);
-    await reload(); 
+  const handleRemoveMember = (memberId) => {
+    openConfirmModal({
+      title: "Remove Family Member?",
+      message: "Are you sure you want to remove this member?",
+      onConfirm: async () => {
+        await removeFamilyMemberApi(familyId, memberId);
+        await reload(); 
+      },
+    });
   };
 
   /**
    * Deletes the entire family and updates the dashboard.
+   * Opens a confirm modal before calling the API.
    */
-  const handleDeleteFamily = async () => {
-    await deleteFamilyApi(familyId);
-    removeFamily(Number(familyId));
-    navigate("/dashboard");
+  const handleDeleteFamily = () => {
+    openConfirmModal({
+      title: "Delete Family?",
+      message: "Are you sure you want to delete this family? This action cannot be undone.",
+      onConfirm: async () => {
+        await deleteFamilyApi(familyId);
+        removeFamily(Number(familyId));
+        navigate("/dashboard");
+      },
+    });
   };
 
   /**
    * Deletes a chore and reloads family chores.
+   * Opens a confirm modal before calling the API.
    */
-  const handleDeleteChoreLocal = async (choreId) => {
-    await handleDeleteChore(choreId);
-    await reload();
+  const handleDeleteChoreLocal = (choreId) => {
+    openConfirmModal({
+      title: "Delete Chore?",
+      message: "Are you sure you want to delete this chore?",
+      onConfirm: async () => {
+        await handleDeleteChore(choreId);
+        await reload();
+      },
+    });
   };
 
   return (
@@ -105,18 +150,22 @@ export default function FamilyChoreBoard() {
       />
 
       {/* Chore columns by status */}
-      {columns.map((col) => (
-        <ChoreColumn
-          key={col.status}
-          column={col}
-          chores={filteredChores.filter((c) => c.status === col.status)}
-          currentUser={currentUser}
-          onSubmit={(chore) => setSubmissionModalData(chore)}
-          onViewHistory={(chore) => setHistoryModalData(chore)}
-          onDeleteChore={handleDeleteChoreLocal}
-          onViewSubmission={(data) => setViewSubmissionData(data)}
-        />
-      ))}
+      <div className="choreboard-wrapper">
+        <div className="family-choreboard-columns">
+          {columns.map((col) => (
+            <ChoreColumn
+              key={col.status}
+              column={col}
+              chores={filteredChores.filter((c) => c.status === col.status)}
+              currentUser={currentUser}
+              onSubmit={(chore) => setSubmissionModalData(chore)}
+              onViewHistory={(chore) => setHistoryModalData(chore)}
+              onDeleteChore={handleDeleteChoreLocal}
+              onViewSubmission={(data) => setViewSubmissionData(data)}
+            />
+          ))}
+        </div>
+      </div>  
 
       {/* Modals */}
       {newChoreModalOpen && (
@@ -153,32 +202,35 @@ export default function FamilyChoreBoard() {
       {/* ViewSubmissionModal for parent to approve/reject latest submission */}
       {viewSubmissionData && (
         <ViewSubmissionModal
-            chore={viewSubmissionData.chore}
-            submission={viewSubmissionData.submission}
-            onClose={() => setViewSubmissionData(null)}
-            onDecision={async (decision, comment, submission) => {
-                // decision = "APPROVE" | "REJECT"
-                try {
-                if (decision === "APPROVE") {
-                    await approveChoreSubmission(
-                    viewSubmissionData.chore.id,
-                    submission.id,
-                    comment
-                    );
-                } else if (decision === "REJECT") {
-                    await rejectChoreSubmission(
-                    viewSubmissionData.chore.id,
-                    submission.id,
-                    comment
-                    );
-                }
-                await reload();
-                } catch (err) {
-                console.error("Error updating submission:", err);
-                } finally {
-                setViewSubmissionData(null);
-                }
-            }}
+          chore={viewSubmissionData.chore}
+          submission={viewSubmissionData.submission}
+          onClose={() => setViewSubmissionData(null)}
+          onDecision={async (decision, comment, submission) => {
+            try {
+              if (decision === "APPROVE") {
+                await approveChoreSubmission(viewSubmissionData.chore.id, submission.id, comment);
+              } else if (decision === "REJECT") {
+                await rejectChoreSubmission(viewSubmissionData.chore.id, submission.id, comment);
+              }
+              await reload();
+            } catch (err) {
+              console.error("Error updating submission:", err);
+            } finally {
+              setViewSubmissionData(null);
+            }
+          }}
+        />
+      )}
+
+      {/* ConfirmModal: used for delete confirmations (family, member, chore) */}
+      {confirmModal.isOpen && (
+        <ConfirmModal
+          title={confirmModal.title}
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={closeConfirmModal}
+          confirmText="Yes"
+          cancelText="Cancel"
         />
       )}
     </div>

@@ -15,6 +15,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 html, body {
@@ -36,6 +37,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* H1 */
+h1 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  color: var(--brown);
+  text-shadow: var(--shadow);
 }
 
 /* LINKS */
@@ -70,6 +79,21 @@ button:hover {
   transform: translateY(-2px);
 }
 
+button:disabled {
+  background-color: #ccc;    
+  border: 2px solid #999;     
+  color: #666;            
+  cursor: not-allowed;        
+  box-shadow: none;            
+  transform: none;             
+}
+
+button:not(:disabled):hover {
+  background-color: var(--orange);
+  transform: translateY(-2px);
+}
+
+
 /* FORMS */
 input, select, textarea {
   border: 2px solid var(--brown);
@@ -83,14 +107,29 @@ label {
   display: block;
 }
 
-/* RESPONSIVE BREAKPOINTS */
+ul {
+  list-style: none; 
+}
+
+hr {
+  height: 1px;
+  background-color: var(--brown);
+  border: none;
+  margin: 0.5rem 0;
+}
+
+/* iPad */
 @media (min-width: 768px) {
   body {
     padding: 1rem;
   }
 }
 
+/* Desktop */
 @media (min-width: 1024px) {
   body {
+    h1 {
+      font-size: 2.5rem;
+    }
   }
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../shared/components/InputField";
 import Modal from "../../../shared/components/Modal";
+import ConfirmModal from "../../../shared/components/ConfirmModal";
 import { useError } from "../../../shared/context/ErrorContext";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useEditUserForm } from "../hooks/useEditUserForm";
@@ -113,14 +114,14 @@ export default function EditUserForm() {
 
       {/* Delete confirmation modal */}
       {showDeleteModal && (
-        <Modal
+        <ConfirmModal
           title="Confirm Delete"
-          onClose={() => setShowDeleteModal(false)}
-        >
-          <p>Are you sure you want to delete your account? This cannot be undone.</p>
-          <button onClick={confirmDelete} className="delete-btn">Yes, Delete</button>
-          <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-        </Modal>
+          message="Are you sure you want to delete your account? This cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => setShowDeleteModal(false)}
+          confirmText="Yes, Delete"
+          cancelText="Cancel"
+       />
       )}
 
       {/* Success / info modal */}

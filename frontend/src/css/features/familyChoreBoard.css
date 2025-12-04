@@ -1,0 +1,257 @@
+.family-choreboard {
+  width: 100%;        
+  max-width: 1200px;  
+  margin: 0 auto;      
+  padding: 0.5rem;       
+}
+
+.family-choreboard > .family-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.family-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--brown);
+}
+
+.family-wrapper {
+  border-radius: var(--radius);
+  border: 2px solid var(--brown);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.family-wrapper h1 {
+  margin-bottom: 0.5rem; 
+}
+
+.family-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  align-items: center;
+}
+
+.parents-section > strong,
+.children-section > strong {
+  font-size: 1.5rem; 
+  margin-bottom: 1rem;
+  display: block;
+  color: var(--brown);
+}
+
+.parents-section {
+  margin-bottom: 0.7rem; 
+}
+
+.children-section {
+  padding-top: 0.7rem;
+}
+
+.member-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.member-card {
+  background-color: var(--white);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius);
+  padding: 1rem;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  gap: 0.5rem;
+  box-shadow: var(--shadow);
+}
+
+.child-card .stats {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.child-card .stats > div {
+  display: flex;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.member-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--brown);
+}
+
+.label {
+  font-weight: bolder;
+  color: var(--gray-dark);
+}
+
+.member-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.member-actions button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.member-actions .danger {
+  background-color: var(--brown);
+  color: var(--yellow);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.member-actions .danger:hover {
+  background-color: var(--orange);
+  color: var(--brown);
+  transform: translateY(-2px);
+}
+
+.family-actions {
+  display: flex;
+  flex-direction: column; 
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center; 
+  width: 100%;
+  max-width: 600px;
+}
+
+.family-actions button {
+  padding: 0.7rem;
+  font-size: 1rem;
+  width: 100%; 
+}
+
+.remove-btn {
+  background-color: var(--brown);
+  color: var(--yellow);
+  border: 2px solid var(--brown);
+}
+
+.remove-btn:hover {
+  background-color: var(--orange);
+  color: var(--brown);
+}
+
+.choreboard-wrapper {
+  border-radius: var(--radius);
+  border: 2px solid var(--brown);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  margin-top: 1.5rem;
+}
+
+.family-choreboard-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;             
+  width: 100%;
+}
+
+.chore-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;  
+}
+
+.chore-column > h2 {
+  text-align: center; 
+  margin-top: 0.6rem;
+}
+
+.chore-card {
+  text-align: center; 
+  background-color: var(--white);
+  border: 2px solid var(--brown);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem; 
+}
+
+.chore-card h3 {
+  margin-bottom: 0.2rem;
+  font-size: 1.2rem; 
+  font-weight: bold;
+  color: var(--brown);
+}
+
+.chore-card p {
+  font-size: 1rem;
+  margin: 0; 
+}
+
+.chore-actions {
+  display: flex;           
+  flex-wrap: wrap;         
+  gap: 0.3rem 0.3rem;    
+  justify-content: center; 
+}
+
+.chore-actions button {
+  padding: 0.5rem;        
+  font-size: 1rem;
+}
+
+.chore-filter {
+  max-width: 300px; 
+  margin: 1rem auto; 
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .family-choreboard-columns {
+    flex-direction: row;
+    gap: 1rem; 
+  }
+
+  .family-actions {
+    flex-direction: row; 
+    justify-content: center; 
+    width: auto;
+    max-width: unset;
+  }
+
+  .family-actions button {
+    width: auto;
+    min-width: 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .family-choreboard-columns {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .child-card .stats {
+    flex-direction: row; /* bredvid varandra på desktop */
+  }
+}

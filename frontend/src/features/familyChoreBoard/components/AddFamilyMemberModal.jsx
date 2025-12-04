@@ -49,9 +49,9 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
 
       {foundUser && (
         <div className="found-user">
-          <p>
+          <strong>
             {foundUser.firstName} ({foundUser.role})
-          </p>
+          </strong>
           <button
             onClick={handleAddMember}
             disabled={isAlreadyMember}

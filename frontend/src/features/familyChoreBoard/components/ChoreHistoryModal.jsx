@@ -19,6 +19,7 @@ export default function ChoreHistoryModal({ chore, onClose }) {
           )}
           <p><strong>Parent comment:</strong> {sub.commentParent || "—"}</p>
           <p>Status: {sub.approvedByParent ? "Approved" : "Not Approved"}</p>
+          <hr />
         </div>
       ))}
     </Modal>

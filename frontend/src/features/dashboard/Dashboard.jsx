@@ -4,7 +4,7 @@ import useFamilies from "./hooks/useFamilies";
 import NewFamilyModal from "./components/NewFamilyModal";
 import ErrorBanner from "../../shared/components/ErrorBanner";
 import "../../css/features/dashboard.css";
-import familyImage from "../../assets/family.png";
+import boygirlChoreImage from "../../assets/girl_boy_laundry.png";
 import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 
 
@@ -32,12 +32,12 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <ErrorBanner message={error} />
       <h1>Dashboard</h1>
-      <img src={familyImage} alt="Happy family illustration" className="dashboard-image" />
+      <img src={boygirlChoreImage} alt="Girl and boy doing laundry" className="dashboard-image" />
       {/* List of families */}
       <ul className="family-list">
         {families.map((f) => (
           <li key={f.id}>
-            <Link to={`/family-choreboard/${f.id}`}>{f.familyName}</Link>
+            <Link to={`/family-choreboard/${f.id}`}>→ {f.familyName}</Link>
           </li>
         ))}
       </ul>     

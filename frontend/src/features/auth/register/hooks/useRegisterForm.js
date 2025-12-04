@@ -30,7 +30,12 @@ export function useRegisterForm(initialValues = { firstName: "", email: "", pass
    * Checks if the current form values are valid.
    * Returns true only if all fields pass their respective validation rules.
    */
-  const isValid = () => Object.values(errors).every(err => !err || (Array.isArray(err) && err.length === 0));
+  const isValid = () => {
+    return Object.values(errors).every(errArray => {
+        if (!errArray || errArray.length === 0) return true;
+        return errArray.every(item => item.isValid);
+    });
+   };
 
   return { form, errors, handleChange, isValid };
 }

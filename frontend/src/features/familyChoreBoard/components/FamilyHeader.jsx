@@ -1,3 +1,8 @@
+import { useWeeklyChildStats } from "../../../shared/hooks/useWeeklyChildStats";
+import useCurrentWeek from "../../../shared/hooks/useCurrentWeek";
+import { useState } from "react";
+import ChildWeeklyStatsModal from "./ChildWeeklyStatsModal";
+
 export default function FamilyHeader({
   family,
   currentUser,
@@ -9,46 +14,91 @@ export default function FamilyHeader({
   const parents = family.members.filter((m) => m.role === "PARENT");
   const children = family.members.filter((m) => m.role === "CHILD");
 
+  const [selectedChildStats, setSelectedChildStats] = useState(null);
+
+  const currentWeek = useCurrentWeek();
+
   return (
     <div className="family-header">
-      <h1>{family.familyName}</h1>
-
-      <div className="family-info">
-        <div>
-          <strong>Parents:</strong>{" "}
-          {parents.map((p) => p.firstName).join(", ")}
+      <h1>Week {currentWeek}</h1>    
+      
+      <div className="family-wrapper"> 
+        <div className="family-info">
+          <h1>{family.familyName}</h1>
+          {/* Parents section */}
+          <div className="parents-section">
+            <strong>Parents</strong>
+            <div className="member-cards">
+              {parents.map((p) => (
+                <div key={p.id} className="member-card">
+                  <span className="member-name">{p.firstName}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div>
-          <strong>Children:</strong>
-          {children.map((c) => (
-            <div key={c.id} className="child-stats">
-              <span>{c.firstName}</span>
-              <span>Completed Chores: {c.completedChoresCount || 0}</span>
-              <span>Earned Coins: {c.earnedCoins || 0}</span>
+        {/* Children section */}
+        <div className="children-section">
+          <strong>Children</strong>
+          <div className="member-cards">
+            {children.map((c) => {
+              const { stats } = useWeeklyChildStats(c.id);
+              const currentWeekStat = stats?.[0] || {};
 
-              {currentUser.role === "PARENT" && (
-                <button
-                  className="danger"
-                  onClick={() => onRemoveMember(c.id)}
-                >
-                  Remove Member
-                </button>
-              )}
-            </div>
-          ))}
+              return (
+                <div key={c.id} className="member-card child-card">
+                  <span className="member-name">{c.firstName}</span>
+
+                  <div className="stats">
+                    <div>
+                      <span className="label">Completed Chores:</span>{" "}
+                      {(currentWeekStat.completedChoresCount || 0) + ", "}
+                    </div>
+                    <div>
+                      <span className="label">Earned Coins:</span>{" "}
+                      {currentWeekStat.earnedCoins || 0}
+                    </div>
+                  </div>
+
+                  <div className="member-actions">
+                    {/* History/Stats visible for everyone */}
+                    <button title="Week History" onClick={() => setSelectedChildStats({ child: c, stats })}>
+                      History
+                    </button>
+
+                    {/* Remove member only for parents */}
+                    {currentUser.role === "PARENT" && (
+                      <button title="Remove From Family" className="remove-btn" onClick={() => onRemoveMember(c.id)}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
+      {/* Parent actions: New Chore / Add Member / Remove Family */}
       {currentUser.role === "PARENT" && (
         <div className="family-actions">
           <button onClick={onAddChore}>New Chore</button>
           <button onClick={onAddMember}>Add Family Member</button>
-
-          <button className="danger" onClick={onDeleteFamily}>
+          <button className="remove-btn" onClick={onDeleteFamily}>
             Remove Family
           </button>
         </div>
+      )}
+
+      {/* Weekly Stats Modal */}
+      {selectedChildStats && (
+        <ChildWeeklyStatsModal
+          child={selectedChildStats.child}
+          stats={selectedChildStats.stats}
+          onClose={() => setSelectedChildStats(null)}
+        />
       )}
     </div>
   );

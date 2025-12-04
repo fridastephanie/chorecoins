@@ -1,5 +1,5 @@
 import "../../css/features/landing.css";
-import familyImage from "../../assets/family.png";
+import familyImage from "../../assets/family_inside.png";
 import AuthButtons from "./components/AuthButtons";
 import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 

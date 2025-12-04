@@ -21,7 +21,7 @@ export default function FamilyHeader({
   return (
     <div className="family-header">
       <h1>Week {currentWeek}</h1>    
-      
+
       <div className="family-wrapper"> 
         <div className="family-info">
           <h1>{family.familyName}</h1>
@@ -44,7 +44,9 @@ export default function FamilyHeader({
           <div className="member-cards">
             {children.map((c) => {
               const { stats } = useWeeklyChildStats(c.id);
-              const currentWeekStat = stats?.[0] || {};
+
+              const filteredStats = stats?.filter(s => s.familyId === family.id) || [];
+              const currentWeekStat = filteredStats[0] || {};
 
               return (
                 <div key={c.id} className="member-card child-card">
@@ -62,14 +64,23 @@ export default function FamilyHeader({
                   </div>
 
                   <div className="member-actions">
-                    {/* History/Stats visible for everyone */}
-                    <button title="Week History" onClick={() => setSelectedChildStats({ child: c, stats })}>
+                    <button
+                      title="Week History"
+                      onClick={() => setSelectedChildStats({ 
+                        child: c, 
+                        stats: filteredStats
+                      })}
+                    >
                       History
                     </button>
 
                     {/* Remove member only for parents */}
                     {currentUser.role === "PARENT" && (
-                      <button title="Remove From Family" className="remove-btn" onClick={() => onRemoveMember(c.id)}>
+                      <button
+                        title="Remove From Family"
+                        className="remove-btn"
+                        onClick={() => onRemoveMember(c.id)}
+                      >
                         Remove
                       </button>
                     )}

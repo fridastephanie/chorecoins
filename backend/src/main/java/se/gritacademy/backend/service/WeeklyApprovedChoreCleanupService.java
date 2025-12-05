@@ -8,7 +8,6 @@ import se.gritacademy.backend.entity.chore.ChoreStatus;
 import se.gritacademy.backend.repository.ChoreRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

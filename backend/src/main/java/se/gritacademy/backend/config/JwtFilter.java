@@ -1,10 +1,10 @@
 package se.gritacademy.backend.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import se.gritacademy.backend.config.JwtUtil;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.repository.UserRepository;
 import se.gritacademy.backend.service.TokenBlacklistService;
@@ -16,17 +16,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final TokenBlacklistService tokenBlacklistService;
-
-    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository, TokenBlacklistService tokenBlacklistService) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.tokenBlacklistService = tokenBlacklistService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -38,20 +33,19 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         String token = extractToken(request);
         if (token != null) {
             if (isTokenInvalid(token, response)) {
                 return;
             }
-
             User user = getUserFromToken(token);
             String role = jwtUtil.getRoleFromToken(token);
             setAuthentication(user, role);
         }
-
         filterChain.doFilter(request, response);
     }
+
+    // ----------------- PRIVATE HELPERS -----------------
 
     /**
      * HELPER: Extract Bearer token from Authorization header

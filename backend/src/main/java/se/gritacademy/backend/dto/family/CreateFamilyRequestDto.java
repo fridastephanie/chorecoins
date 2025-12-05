@@ -8,7 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateFamilyRequestDto {
+
     @NotBlank(message = "Family name is required")
     @Size(max = 50, message = "Family name cannot exceed 50 character")
     private String familyName;
+
 }

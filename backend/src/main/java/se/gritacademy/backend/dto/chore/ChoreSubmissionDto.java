@@ -9,6 +9,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class ChoreSubmissionDto {
+
     private Long id;
     private String commentChild;
     private Set<String> imageUrls;
@@ -16,4 +17,5 @@ public class ChoreSubmissionDto {
     private Instant submittedAt;
     private boolean approvedByParent;
     private String commentParent;
+
 }

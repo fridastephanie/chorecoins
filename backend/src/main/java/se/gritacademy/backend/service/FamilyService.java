@@ -1,5 +1,6 @@
 package se.gritacademy.backend.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -10,27 +11,22 @@ import se.gritacademy.backend.entity.family.Family;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.helper.FamilyHelper;
+import se.gritacademy.backend.helper.UserHelper;
 import se.gritacademy.backend.mapper.FamilyMapper;
 import se.gritacademy.backend.repository.FamilyRepository;
-import se.gritacademy.backend.repository.UserRepository;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FamilyService {
 
+    private final UserHelper userHelper;
+    private final FamilyHelper familyHelper;
     private final FamilyRepository familyRepository;
-    private final UserRepository userRepository;
     private final FamilyMapper familyMapper;
-
-    public FamilyService(FamilyRepository familyRepository,
-                         UserRepository userRepository,
-                         FamilyMapper familyMapper) {
-        this.familyRepository = familyRepository;
-        this.userRepository = userRepository;
-        this.familyMapper = familyMapper;
-    }
 
     /**
      * Create a new family and add the creator as a member.
@@ -46,10 +42,9 @@ public class FamilyService {
      * Add an existing user to a family.
      */
     public FamilyDto addMember(Long familyId, Long userId, Parent actor) {
-        Family family = getFamilyOrThrow(familyId);
-        verifyFamilyMember(family, actor);
-
-        User user = getUserOrThrow(userId);
+        Family family = familyHelper.getFamilyOrThrow(familyId);
+        familyHelper.verifyFamilyMember(family, actor);
+        User user = userHelper.getUserOrThrow(userId);
         family.getMembers().add(user);
         return saveAndMap(family);
     }
@@ -58,28 +53,21 @@ public class FamilyService {
      * Remove an existing user from a family.
      */
     public FamilyDto removeMember(Long familyId, Long userId, Parent actor) {
-        Family family = getFamilyOrThrow(familyId);
-        verifyFamilyMember(family, actor);
-        User user = getUserOrThrow(userId);
-
+        Family family = familyHelper.getFamilyOrThrow(familyId);
+        familyHelper.verifyFamilyMember(family, actor);
+        User user = userHelper.getUserOrThrow(userId);
         if (user instanceof Child child) {
-            Set<Chore> choresToRemove = getChoresToRemove(child, familyId);
-            removeChoresFromChildAndFamily(choresToRemove, child, family);
+            removeChildChoresFromFamily(child, family);
         }
-
-        if (!family.getMembers().remove(user)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of this family");
-        }
-        return saveAndMap(family);
+        return removeUserFromFamilyAndSave(user, family);
     }
 
     /**
      * Update the name of an existing family.
      */
     public FamilyDto updateFamilyName(Long familyId, String newName, Parent actor) {
-        Family family = getFamilyOrThrow(familyId);
-        verifyFamilyMember(family, actor);
-
+        Family family = familyHelper.getFamilyOrThrow(familyId);
+        familyHelper.verifyFamilyMember(family, actor);
         family.setFamilyName(newName);
         return saveAndMap(family);
     }
@@ -88,9 +76,8 @@ public class FamilyService {
      * Delete a family by its ID.
      */
     public void deleteFamily(Long familyId, Parent actor) {
-        Family family = getFamilyOrThrow(familyId);
-        verifyFamilyMember(family, actor);
-
+        Family family = familyHelper.getFamilyOrThrow(familyId);
+        familyHelper.verifyFamilyMember(family, actor);
         familyRepository.delete(family);
     }
 
@@ -98,39 +85,12 @@ public class FamilyService {
      * Get a family by ID, including all members.
      */
     public FamilyDto getFamily(Long familyId, User actor) {
-        Family family = getFamilyOrThrow(familyId);
-        verifyFamilyMember(family, actor);
-
+        Family family = familyHelper.getFamilyOrThrow(familyId);
+        familyHelper.verifyFamilyMember(family, actor);
         return familyMapper.toFamilyDto(family);
     }
 
-    /**
-     * Verify that a user is a member of the family.
-     * Throws 403 if not a member.
-     */
-    public void verifyFamilyMember(Family family, User user) {
-        boolean isMember = family.getMembers().stream()
-                .anyMatch(member -> member.getId().equals(user.getId()));
-        if (!isMember) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User must belong to the family");
-        }
-    }
-
-    /**
-     * HELPER: Fetch family or throw 404
-     */
-    private Family getFamilyOrThrow(Long familyId) {
-        return familyRepository.findById(familyId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Family not found"));
-    }
-
-    /**
-     * HELPER: Fetch user or throw 404
-     */
-    private User getUserOrThrow(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
+    // ----------------- PRIVATE HELPERS -----------------
 
     /**
      * HELPER: Save family and map to DTO
@@ -138,6 +98,24 @@ public class FamilyService {
     private FamilyDto saveAndMap(Family family) {
         family = familyRepository.save(family);
         return familyMapper.toFamilyDto(family);
+    }
+
+    /**
+     * HELPER: Remove all chores of a child from a family.
+     */
+    private void removeChildChoresFromFamily(Child child, Family family) {
+        Set<Chore> choresToRemove = getChoresToRemove(child, family.getId());
+        removeChoresFromChildAndFamily(choresToRemove, child, family);
+    }
+
+    /**
+     * HELPER: Remove a user from the family and save.
+     */
+    private FamilyDto removeUserFromFamilyAndSave(User user, Family family) {
+        if (!family.getMembers().remove(user)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not a member of this family");
+        }
+        return saveAndMap(family);
     }
 
     /**

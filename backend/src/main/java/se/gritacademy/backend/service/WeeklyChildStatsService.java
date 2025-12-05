@@ -10,9 +10,10 @@ import se.gritacademy.backend.entity.family.Family;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.entity.weeklychildstats.WeeklyChildStats;
+import se.gritacademy.backend.helper.FamilyHelper;
+import se.gritacademy.backend.helper.UserHelper;
+import se.gritacademy.backend.helper.WeeklyChildStatsHelper;
 import se.gritacademy.backend.mapper.WeeklyChildStatsMapper;
-import se.gritacademy.backend.repository.FamilyRepository;
-import se.gritacademy.backend.repository.UserRepository;
 import se.gritacademy.backend.repository.WeeklyChildStatsRepository;
 
 import java.util.List;
@@ -21,11 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WeeklyChildStatsService {
 
+    private final UserHelper userHelper;
+    private final FamilyHelper familyHelper;
+    private final WeeklyChildStatsHelper weeklyChildStatsHelper;
     private final WeeklyChildStatsRepository weeklyChildStatsRepository;
-    private final UserRepository userRepository;
-    private final FamilyRepository familyRepository;
     private final WeeklyChildStatsMapper mapper;
-    private final FamilyService familyService;
 
     /**
      * Creates weekly stats for a child/family for the scheduler.
@@ -34,9 +35,10 @@ public class WeeklyChildStatsService {
     @Transactional
     public void createWeeklyStatsSystem(CreateWeeklyChildStatsRequestDto dto) {
         Child child = getChildOrThrow(dto.getChildId());
-        Family family = getFamilyOrThrow(dto.getFamilyId());
-        ensureStatsNotExist(child.getId(), family.getId(), dto.getWeekNumber(), dto.getYear());
-        WeeklyChildStats stats = buildWeeklyStats(child, family, dto);
+        Family family = familyHelper.getFamilyOrThrow(dto.getFamilyId());
+        WeeklyChildStats stats = weeklyChildStatsHelper.getOrCreateCurrentWeekStats(child, family);
+        stats.setCompletedChoresCount(dto.getCompletedChoresCount());
+        stats.setEarnedCoins(dto.getEarnedCoins());
         weeklyChildStatsRepository.save(stats);
     }
 
@@ -46,10 +48,11 @@ public class WeeklyChildStatsService {
     @Transactional
     public WeeklyChildStatsDto createWeeklyStats(CreateWeeklyChildStatsRequestDto dto, User currentUser) {
         Child child = getChildOrThrow(dto.getChildId());
-        Family family = getFamilyOrThrow(dto.getFamilyId());
+        Family family = familyHelper.getFamilyOrThrow(dto.getFamilyId());
         verifyAccessForChildOrParent(child.getId(), family, currentUser);
-        ensureStatsNotExist(child.getId(), family.getId(), dto.getWeekNumber(), dto.getYear());
-        WeeklyChildStats stats = buildWeeklyStats(child, family, dto);
+        WeeklyChildStats stats = weeklyChildStatsHelper.getOrCreateCurrentWeekStats(child, family);
+        stats.setCompletedChoresCount(dto.getCompletedChoresCount());
+        stats.setEarnedCoins(dto.getEarnedCoins());
         return mapper.toDto(weeklyChildStatsRepository.save(stats));
     }
 
@@ -74,15 +77,15 @@ public class WeeklyChildStatsService {
     }
 
     /**
-     * Get all weekly stats for a child. Throws 404 if child not found.
+     * Get all weekly stats for a child. Throws 404 if child not found, 403 if not a child.
      */
     public List<WeeklyChildStatsDto> getStatsForChild(Long childId, User currentUser) {
-        verifyChildExists(childId);
-        return weeklyChildStatsRepository.findByChildId(childId)
+        Child child = getChildOrThrow(childId);
+        return weeklyChildStatsRepository.findByChildId(child.getId())
                 .stream()
                 .filter(stats -> {
                     try {
-                        verifyAccessForChildOrParent(childId, stats.getFamily(), currentUser);
+                        verifyAccessForChildOrParent(child.getId(), stats.getFamily(), currentUser);
                         return true;
                     } catch (ResponseStatusException e) {
                         return false;
@@ -116,6 +119,25 @@ public class WeeklyChildStatsService {
                 .isPresent();
     }
 
+    // ----------------- PRIVATE HELPERS -----------------
+
+    /**
+     * HELPER: Fetch Child by ID using UserHelper. Throws 404 if not found, 403 if not a Child.
+     */
+    private Child getChildOrThrow(Long childId) {
+        User user = userHelper.getUserOrThrow(childId);
+        return userHelper.ensureChild(user);
+    }
+
+    /**
+     * HELPER: Verify access for CHILD/PARENT. Throws 403 if not allowed.
+     */
+    private void verifyAccessForChildOrParent(Long childId, Family family, User currentUser) {
+        if (currentUser.getRole().equals("CHILD") && !currentUser.getId().equals(childId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Children can only access their own stats");
+        if (currentUser.getRole().equals("PARENT")) familyHelper.verifyFamilyMember(family, currentUser);
+    }
+
     /**
      * HELPER: Fetch WeeklyChildStats by ID. Throws 404 if not found.
      */
@@ -133,36 +155,10 @@ public class WeeklyChildStatsService {
             Long familyId,
             int weekNumber,
             int year) {
-
         return weeklyChildStatsRepository
                 .findByChildIdAndFamilyIdAndWeekNumberAndYear(childId, familyId, weekNumber, year)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Stats not found for this child, family, week and year"));
-    }
-
-    /**
-     * HELPER: Ensure stats do not exist for child/family/week/year. Throws 400 if exists.
-     */
-    private void ensureStatsNotExist(Long childId, Long familyId, int weekNumber, int year) {
-        weeklyChildStatsRepository.findByChildIdAndFamilyIdAndWeekNumberAndYear(childId, familyId, weekNumber, year)
-                .ifPresent(existing -> {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "Weekly stats for this child, family and week already exist");
-                });
-    }
-
-    /**
-     * HELPER: Build WeeklyChildStats from DTO.
-     */
-    private WeeklyChildStats buildWeeklyStats(Child child, Family family, CreateWeeklyChildStatsRequestDto dto) {
-        WeeklyChildStats stats = new WeeklyChildStats();
-        stats.setChild(child);
-        stats.setFamily(family);
-        stats.setWeekNumber(dto.getWeekNumber());
-        stats.setYear(dto.getYear());
-        stats.setCompletedChoresCount(dto.getCompletedChoresCount());
-        stats.setEarnedCoins(dto.getEarnedCoins());
-        return stats;
     }
 
     /**
@@ -171,39 +167,5 @@ public class WeeklyChildStatsService {
     private void updateStatsFromDto(WeeklyChildStats stats, UpdateWeeklyChildStatsRequestDto dto) {
         if (dto.getCompletedChoresCount() != null) stats.setCompletedChoresCount(dto.getCompletedChoresCount());
         if (dto.getEarnedCoins() != null) stats.setEarnedCoins(dto.getEarnedCoins());
-    }
-
-    /**
-     * HELPER: Fetch Child by ID. Throws 404 if not found, 400 if not a Child.
-     */
-    private Child getChildOrThrow(Long childId) {
-        User user = userRepository.findById(childId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Child not found"));
-        if (!(user instanceof Child child)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a child");
-        return child;
-    }
-
-    /**
-     * HELPER: Fetch Family by ID. Throws 404 if not found.
-     */
-    private Family getFamilyOrThrow(Long familyId) {
-        return familyRepository.findById(familyId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Family not found"));
-    }
-
-    /**
-     * HELPER: Verify that a child exists. Throws 404 if not found.
-     */
-    private void verifyChildExists(Long childId) {
-        if (!userRepository.existsById(childId)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Child not found");
-    }
-
-    /**
-     * HELPER: Verify access for CHILD/PARENT. Throws 403 if not allowed.
-     */
-    private void verifyAccessForChildOrParent(Long childId, Family family, User currentUser) {
-        if (currentUser.getRole().equals("CHILD") && !currentUser.getId().equals(childId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Children can only access their own stats");
-        if (currentUser.getRole().equals("PARENT")) familyService.verifyFamilyMember(family, currentUser);
     }
 }

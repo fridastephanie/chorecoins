@@ -14,8 +14,12 @@ import java.util.Date;
 public class JwtUtil {
 
     private final SecretKey secretKey;
-    private final long EXPIRATION_MS = 86400000; // 1 day
+    private final long EXPIRATION_MS = 7200000; // 2 hours
 
+    /**
+     * Constructor to initialize the secret key from application properties.
+     * Throws IllegalArgumentException if secret is missing or blank.
+     */
     public JwtUtil(@Value("${jwt.secret}") String jwtSecret) {
         if (jwtSecret == null || jwtSecret.isBlank()) {
             throw new IllegalArgumentException("JWT_SECRET is missing!");
@@ -23,6 +27,9 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Generate a JWT token for a given user.
+     */
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getId().toString())
@@ -33,6 +40,9 @@ public class JwtUtil {
                 .compact();
     }
 
+    /**
+     * Extract the user ID from a JWT token.
+     */
     public String getUserIdFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -42,6 +52,9 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    /**
+     * Extract the role claim from a JWT token.
+     */
     public String getRoleFromToken(String token) {
         return (String) Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -51,6 +64,9 @@ public class JwtUtil {
                 .get("role");
     }
 
+    /**
+     * Validate the JWT token.
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()

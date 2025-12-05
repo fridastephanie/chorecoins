@@ -9,7 +9,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class FamilyDto {
+
     private Long id;
     private String familyName;
     private Set<UserDto> members;
+
 }

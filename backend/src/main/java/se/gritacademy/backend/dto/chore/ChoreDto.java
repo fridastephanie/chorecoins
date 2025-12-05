@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class ChoreDto {
+
     private Long id;
     private String title;
     private String description;
@@ -24,4 +25,5 @@ public class ChoreDto {
     private Instant createdAt;
     private Instant updatedAt;
     private Set<ChoreSubmissionDto> submissions;
+
 }

@@ -1,5 +1,6 @@
 package se.gritacademy.backend.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import se.gritacademy.backend.dto.chore.ChoreDto;
 import se.gritacademy.backend.entity.chore.Chore;
@@ -8,15 +9,11 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ChoreMapper {
 
     private final UserMapper userMapper;
     private final ChoreSubmissionMapper submissionMapper;
-
-    public ChoreMapper(UserMapper userMapper, ChoreSubmissionMapper submissionMapper) {
-        this.userMapper = userMapper;
-        this.submissionMapper = submissionMapper;
-    }
 
     public ChoreDto toDto(Chore chore) {
         if (chore == null) return null;
@@ -32,7 +29,6 @@ public class ChoreMapper {
         dto.setDueDate(chore.getDueDate());
         dto.setCreatedAt(chore.getCreatedAt());
         dto.setUpdatedAt(chore.getUpdatedAt());
-
         if (chore.getSubmissions() == null || chore.getSubmissions().isEmpty()) {
             dto.setSubmissions(Collections.emptySet());
         } else {
@@ -42,7 +38,6 @@ public class ChoreMapper {
                             .collect(Collectors.toSet())
             );
         }
-
         return dto;
     }
 }

@@ -47,4 +47,5 @@ public class ChoreSubmission {
     @Size(max = 200)
     @Convert(converter = EncryptDecryptConverter.class)
     private String commentParent;
+
 }

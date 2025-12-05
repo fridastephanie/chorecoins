@@ -1,5 +1,6 @@
 package se.gritacademy.backend.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
 import se.gritacademy.backend.dto.user.UpdateUserRequestDto;
 import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.helper.UserHelper;
 import se.gritacademy.backend.mapper.FamilyMapper;
 import se.gritacademy.backend.mapper.UserMapper;
 import se.gritacademy.backend.repository.FamilyRepository;
@@ -18,23 +20,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
+    private final UserHelper userHelper;
     private final UserRepository userRepository;
     private final FamilyRepository familyRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final FamilyMapper familyMapper;
-
-    public UserService(UserRepository userRepository, FamilyRepository familyRepository,
-                       PasswordEncoder passwordEncoder,
-                       UserMapper userMapper, FamilyMapper familyMapper) {
-        this.userRepository = userRepository;
-        this.familyRepository = familyRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-        this.familyMapper = familyMapper;
-    }
 
     /**
      * Registers a new user (Parent or Child) based on the provided request data.
@@ -51,7 +45,7 @@ public class UserService {
      * Retrieves a specific user by ID.
      */
     public UserDto getUser(Long userId) {
-        User user = getUserByIdOrThrow(userId);
+        User user = userHelper.getUserOrThrow(userId);
         return userMapper.toUserDto(user);
     }
 
@@ -59,7 +53,7 @@ public class UserService {
      * Retrieves a specific user by email.
      */
     public UserDto getUserByEmail(String email) {
-        User user = getUserByEmailOrThrow(email);
+        User user = userHelper.getUserOrThrow(email);
         return userMapper.toUserDto(user);
     }
 
@@ -68,7 +62,7 @@ public class UserService {
      * Only allowed if the actor is the same user.
      */
     public UserDto updateUser(Long userId, UpdateUserRequestDto request, User actor) {
-        User targetUser = getUserByIdOrThrow(userId);
+        User targetUser = userHelper.getUserOrThrow(userId);
         checkModifyPermission(actor, targetUser);
         updateFirstName(targetUser, request.getFirstName());
         updateEmail(targetUser, request.getEmail());
@@ -82,7 +76,7 @@ public class UserService {
      * Only allowed if the actor is the same user.
      */
     public void deleteUser(Long userId, User actor) {
-        User user = getUserByIdOrThrow(userId);
+        User user = userHelper.getUserOrThrow(userId);
         checkModifyPermission(actor, user);
         removeUserFromFamilies(user);
         userRepository.delete(user);
@@ -92,13 +86,15 @@ public class UserService {
      * Retrieves all families a user belongs to.
      */
     public List<FamilyDto> getUserFamilies(Long userId, User actor) {
-        User user = getUserByIdOrThrow(userId);
+        User user = userHelper.getUserOrThrow(userId);
         checkViewPermission(actor, user);
         return mapFamiliesToDto(user);
     }
 
+    // ----------------- PRIVATE HELPERS -----------------
+
     /**
-     * HELPER: Ensures the actor can modify the target — only allowed for self.
+     * HELPER: Ensures the actor can modify the target (Only allowed for self)
      */
     private void checkModifyPermission(User actor, User targetUser) {
         if (!actor.getId().equals(targetUser.getId())) {
@@ -135,6 +131,22 @@ public class UserService {
     }
 
     /**
+     * HELPER: Checks if the email is already registered.
+     */
+    private void checkEmailAvailable(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
+    }
+
+    /**
+     * HELPER: Encodes a raw password.
+     */
+    private String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    /**
      * HELPER: Creates a User entity (Parent or Child) depending on request role.
      */
     private User createUserEntity(RegisterUserRequestDto request, String encodedPassword) {
@@ -152,40 +164,6 @@ public class UserService {
      */
     private User saveUser(User user) {
         return userRepository.save(user);
-    }
-
-    /**
-     * HELPER: Checks if the email is already registered.
-     */
-    private void checkEmailAvailable(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
-        }
-    }
-
-    /**
-     * HELPER: Encodes a raw password.
-     */
-    private String encodePassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
-    }
-
-    /**
-     * HELPER: Retrieves a user by ID or throws 404.
-     */
-    private User getUserByIdOrThrow(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    }
-
-    /**
-     * HELPER: Retrieves a user by email or throws 404.
-     */
-    private User getUserByEmailOrThrow(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     /**

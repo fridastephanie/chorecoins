@@ -15,4 +15,5 @@ public class UpdateWeeklyChildStatsRequestDto {
 
     @Min(value = 0, message = "Earned amount cannot be negative")
     private BigDecimal earnedCoins;
+
 }

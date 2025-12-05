@@ -61,4 +61,5 @@ public class Chore {
 
     @OneToMany(mappedBy = "chore", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ChoreSubmission> submissions = new HashSet<>();
+
 }

@@ -14,7 +14,6 @@ public class WeeklyChildStatsMapper {
 
     public WeeklyChildStatsDto toDto(WeeklyChildStats stats) {
         WeeklyChildStatsDto dto = new WeeklyChildStatsDto();
-
         dto.setId(stats.getId());
         dto.setChildId(stats.getChild().getId());
         dto.setFamilyId(stats.getFamily().getId());
@@ -22,7 +21,6 @@ public class WeeklyChildStatsMapper {
         dto.setYear(stats.getYear());
         dto.setCompletedChoresCount(stats.getCompletedChoresCount());
         dto.setEarnedCoins(stats.getEarnedCoins());
-
         return dto;
     }
 

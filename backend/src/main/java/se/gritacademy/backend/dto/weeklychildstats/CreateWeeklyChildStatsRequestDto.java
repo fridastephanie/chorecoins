@@ -28,4 +28,5 @@ public class CreateWeeklyChildStatsRequestDto {
     private Integer completedChoresCount;
 
     private BigDecimal earnedCoins = BigDecimal.ZERO;
+
 }

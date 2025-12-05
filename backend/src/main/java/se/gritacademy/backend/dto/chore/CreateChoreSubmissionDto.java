@@ -9,7 +9,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class CreateChoreSubmissionDto {
+
     @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String commentChild;
     private Set<String> imageUrls;
+
 }

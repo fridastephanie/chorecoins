@@ -1,5 +1,6 @@
 package se.gritacademy.backend.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import se.gritacademy.backend.dto.family.FamilyDto;
 import se.gritacademy.backend.entity.family.Family;
@@ -7,13 +8,10 @@ import se.gritacademy.backend.entity.family.Family;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class FamilyMapper {
 
     private final UserMapper userMapper;
-
-    public FamilyMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
 
     public FamilyDto toFamilyDto(Family family) {
         FamilyDto dto = new FamilyDto();

@@ -1,5 +1,6 @@
 package se.gritacademy.backend.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,38 +10,29 @@ import se.gritacademy.backend.dto.auth.LoginResponseDto;
 import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.dto.user.UserRole;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.helper.UserHelper;
 import se.gritacademy.backend.mapper.UserMapper;
-import se.gritacademy.backend.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final UserHelper userHelper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final UserMapper userMapper;
     private final TokenBlacklistService tokenBlacklistService;
-
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserMapper userMapper, TokenBlacklistService tokenBlacklistService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.userMapper = userMapper;
-        this.tokenBlacklistService = tokenBlacklistService;
-    }
+    private final UserMapper userMapper;
 
     /**
      * Logs in a user by email and password.
      * Throws 401 UNAUTHORIZED if credentials are invalid.
      */
     public LoginResponseDto login(String email, String rawPassword) {
-        User user = getUserOrThrow(email);
+        User user = userHelper.getUserOrThrow(email);
         verifyPassword(rawPassword, user.getPasswordHash());
-
         UserRole userRole = UserRole.valueOf(user.getRole().replace("ROLE_", ""));
         String token = jwtUtil.generateToken(user);
         UserDto userDto = userMapper.toUserDto(user);
-
         return new LoginResponseDto(token, userRole.name(), userDto);
     }
 
@@ -53,16 +45,10 @@ public class AuthService {
         blacklistToken(token);
     }
 
-    /**
-     * HELPER: Fetches a user by email or throws 401 UNAUTHORIZED if not found.
-     */
-    private User getUserOrThrow(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
-    }
+    // ----------------- PRIVATE HELPERS -----------------
 
     /**
-     * HELPER: Verifies that the raw password matches the hashed password.
+     * Verifies that the raw password matches the hashed password.
      * Throws 401 UNAUTHORIZED if it does not match.
      */
     private void verifyPassword(String rawPassword, String hashedPassword) {
@@ -72,7 +58,7 @@ public class AuthService {
     }
 
     /**
-     * HELPER: Extracts the JWT token from the Authorization header.
+     * Extracts the JWT token from the Authorization header.
      * Throws 400 BAD REQUEST if the header is missing or malformed.
      */
     private String extractToken(String authHeader) {
@@ -83,7 +69,7 @@ public class AuthService {
     }
 
     /**
-     * HELPER: Adds the token to the blacklist to invalidate it.
+     * Adds the token to the blacklist to invalidate it.
      */
     private void blacklistToken(String token) {
         tokenBlacklistService.blacklistToken(token);

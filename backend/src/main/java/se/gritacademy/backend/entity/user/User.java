@@ -45,4 +45,5 @@ public abstract class User {
 
     @ManyToMany(mappedBy = "members")
     private Set<Family> families = new HashSet<>();
+
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import se.gritacademy.backend.entity.chore.Chore;
 import se.gritacademy.backend.entity.user.User;
+import se.gritacademy.backend.entity.weeklychildstats.WeeklyChildStats;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,4 +37,8 @@ public class Family {
 
     @OneToMany(mappedBy = "family", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Chore> chores = new HashSet<>();
+
+    @OneToMany(mappedBy = "family", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<WeeklyChildStats> weeklyStats = new HashSet<>();
+
 }

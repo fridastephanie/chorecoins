@@ -72,6 +72,8 @@ public class EncryptDecryptConverter implements AttributeConverter<String, Strin
         }
     }
 
+    // ----------------- PRIVATE HELPERS -----------------
+
     /**
      * HELPER: Generates a random IV (Initialization Vector) for AES/GCM.
      */

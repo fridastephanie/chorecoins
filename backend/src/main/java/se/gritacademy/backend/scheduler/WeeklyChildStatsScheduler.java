@@ -38,6 +38,8 @@ public class WeeklyChildStatsScheduler {
         }
     }
 
+    // ----------------- PRIVATE HELPERS -----------------
+
     /**
      * HELPER: fetch all children with their families
      */

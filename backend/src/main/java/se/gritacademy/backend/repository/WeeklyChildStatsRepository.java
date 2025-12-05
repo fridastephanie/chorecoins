@@ -11,8 +11,5 @@ public interface WeeklyChildStatsRepository extends JpaRepository<WeeklyChildSta
     Optional<WeeklyChildStats> findByChildIdAndFamilyIdAndWeekNumberAndYear(
             Long childId, Long familyId, int weekNumber, int year);
 
-    Optional<WeeklyChildStats> findByChildIdAndWeekNumberAndYear(
-            Long childId, int weekNumber, int year);
-
     List<WeeklyChildStats> findByChildId(Long childId);
 }

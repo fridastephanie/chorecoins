@@ -19,4 +19,5 @@ public class Parent extends User {
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Chore> createdChores = new HashSet<>();
+
 }

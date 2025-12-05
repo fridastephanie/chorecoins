@@ -1,5 +1,6 @@
 package se.gritacademy.backend.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,17 +19,12 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final TokenBlacklistService tokenBlacklistService;
-
-    public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepository, TokenBlacklistService tokenBlacklistService) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.tokenBlacklistService = tokenBlacklistService;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,7 +32,6 @@ public class SecurityConfig {
                 new JwtFilter(jwtUtil, userRepository, tokenBlacklistService),
                 org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
         );
-
         http
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())

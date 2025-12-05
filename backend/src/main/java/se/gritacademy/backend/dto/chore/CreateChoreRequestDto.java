@@ -29,4 +29,5 @@ public class CreateChoreRequestDto {
     private Long familyId;
 
     private Long assignedChildId;
+
 }

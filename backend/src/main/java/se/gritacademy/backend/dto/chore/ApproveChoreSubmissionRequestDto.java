@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ApproveChoreSubmissionRequestDto {
+
     @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String commentParent;
+
 }

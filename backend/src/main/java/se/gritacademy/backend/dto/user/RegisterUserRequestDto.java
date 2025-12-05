@@ -25,4 +25,5 @@ public class RegisterUserRequestDto {
 
     @NotNull(message = "User role is required")
     private UserRole role;
+
 }

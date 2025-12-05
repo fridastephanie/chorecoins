@@ -1,11 +1,11 @@
 package se.gritacademy.backend.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import se.gritacademy.backend.dto.chore.*;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
@@ -15,13 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chores")
+@RequiredArgsConstructor
 public class ChoreController {
 
     private final ChoreService choreService;
-
-    public ChoreController(ChoreService choreService) {
-        this.choreService = choreService;
-    }
 
     @PostMapping
     @PreAuthorize("hasRole('PARENT')")

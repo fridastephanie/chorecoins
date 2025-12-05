@@ -1,6 +1,7 @@
 package se.gritacademy.backend.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import se.gritacademy.backend.dto.auth.LoginRequestDto;
@@ -9,13 +10,10 @@ import se.gritacademy.backend.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)

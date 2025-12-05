@@ -28,12 +28,26 @@ public class WeeklyChildStatsService {
     private final FamilyService familyService;
 
     /**
+     * Creates weekly stats for a child/family for the scheduler.
+     * Does not require a logged-in user. Throws 400 if stats already exist.
+     */
+    @Transactional
+    public void createWeeklyStatsSystem(CreateWeeklyChildStatsRequestDto dto) {
+        Child child = getChildOrThrow(dto.getChildId());
+        Family family = getFamilyOrThrow(dto.getFamilyId());
+        ensureStatsNotExist(child.getId(), family.getId(), dto.getWeekNumber(), dto.getYear());
+        WeeklyChildStats stats = buildWeeklyStats(child, family, dto);
+        weeklyChildStatsRepository.save(stats);
+    }
+
+    /**
      * Create weekly stats for a child/family. Throws 400 if stats already exist.
      */
     @Transactional
-    public WeeklyChildStatsDto createWeeklyStats(CreateWeeklyChildStatsRequestDto dto) {
+    public WeeklyChildStatsDto createWeeklyStats(CreateWeeklyChildStatsRequestDto dto, User currentUser) {
         Child child = getChildOrThrow(dto.getChildId());
         Family family = getFamilyOrThrow(dto.getFamilyId());
+        verifyAccessForChildOrParent(child.getId(), family, currentUser);
         ensureStatsNotExist(child.getId(), family.getId(), dto.getWeekNumber(), dto.getYear());
         WeeklyChildStats stats = buildWeeklyStats(child, family, dto);
         return mapper.toDto(weeklyChildStatsRepository.save(stats));
@@ -43,8 +57,9 @@ public class WeeklyChildStatsService {
      * Update existing weekly stats. Throws 404 if stats not found.
      */
     @Transactional
-    public WeeklyChildStatsDto updateWeeklyStats(Long id, UpdateWeeklyChildStatsRequestDto dto) {
+    public WeeklyChildStatsDto updateWeeklyStats(Long id, UpdateWeeklyChildStatsRequestDto dto, User currentUser) {
         WeeklyChildStats stats = findStatsOrThrow(id);
+        verifyAccessForChildOrParent(stats.getChild().getId(), stats.getFamily(), currentUser);
         updateStatsFromDto(stats, dto);
         return mapper.toDto(weeklyChildStatsRepository.save(stats));
     }
@@ -78,12 +93,16 @@ public class WeeklyChildStatsService {
     }
 
     /**
-     * Get stats for a child for a specific week/year. Throws 404 if not found, 403 if no access.
+     * Get stats for a child for a specific week/year **and family**.
+     * Throws 404 if not found, 403 if no access.
      */
-    public WeeklyChildStatsDto getStatsForChildWeek(Long childId, int weekNumber, int year, User currentUser) {
-        WeeklyChildStats stats = weeklyChildStatsRepository
-                .findByChildIdAndWeekNumberAndYear(childId, weekNumber, year)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Stats not found"));
+    public WeeklyChildStatsDto getStatsForChildWeekAndFamily(
+            Long childId,
+            Long familyId,
+            int weekNumber,
+            int year,
+            User currentUser) {
+        WeeklyChildStats stats = findStatsForChildWeekAndFamilyOrThrow(childId, familyId, weekNumber, year);
         verifyAccessForChildOrParent(childId, stats.getFamily(), currentUser);
         return mapper.toDto(stats);
     }
@@ -103,6 +122,22 @@ public class WeeklyChildStatsService {
     private WeeklyChildStats findStatsOrThrow(Long id) {
         return weeklyChildStatsRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Weekly stats not found"));
+    }
+
+    /**
+     * HELPER: Fetch WeeklyChildStats by child, family, week and year.
+     * Throws 404 if not found.
+     */
+    private WeeklyChildStats findStatsForChildWeekAndFamilyOrThrow(
+            Long childId,
+            Long familyId,
+            int weekNumber,
+            int year) {
+
+        return weeklyChildStatsRepository
+                .findByChildIdAndFamilyIdAndWeekNumberAndYear(childId, familyId, weekNumber, year)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Stats not found for this child, family, week and year"));
     }
 
     /**

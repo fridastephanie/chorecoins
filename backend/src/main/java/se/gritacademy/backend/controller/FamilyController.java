@@ -1,6 +1,7 @@
 package se.gritacademy.backend.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,13 +14,10 @@ import se.gritacademy.backend.service.FamilyService;
 
 @RestController
 @RequestMapping("/api/families")
+@RequiredArgsConstructor
 public class FamilyController {
 
     private final FamilyService familyService;
-
-    public FamilyController(FamilyService familyService) {
-        this.familyService = familyService;
-    }
 
     @PostMapping
     @PreAuthorize("hasRole('PARENT')")

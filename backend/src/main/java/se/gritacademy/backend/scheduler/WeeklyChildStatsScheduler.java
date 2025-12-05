@@ -57,7 +57,7 @@ public class WeeklyChildStatsScheduler {
             dto.setYear(year);
             dto.setCompletedChoresCount(0);
             dto.setEarnedCoins(BigDecimal.ZERO);
-            weeklyChildStatsService.createWeeklyStats(dto);
+            weeklyChildStatsService.createWeeklyStatsSystem(dto);
         }
     }
 

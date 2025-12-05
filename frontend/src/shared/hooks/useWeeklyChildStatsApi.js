@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getWeeklyStatsForChild } from "../api/weeklyChildStats";
 
-export const useWeeklyChildStats = (childId) => {
+export const useWeeklyChildStatsApi = (childId) => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

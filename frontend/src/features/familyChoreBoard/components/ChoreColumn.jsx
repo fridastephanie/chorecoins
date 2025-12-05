@@ -13,7 +13,10 @@ export default function ChoreColumn({
     <div className="chore-column">
       <h2>{column.title}</h2>
 
-      {chores.map((chore) => (
+      {chores.length === 0 ? (
+        <p className="no-chores">No chores yet</p>
+      ) : (
+       chores.map((chore) => (
         <ChoreCard
           key={chore.id}
           chore={chore}
@@ -23,7 +26,8 @@ export default function ChoreColumn({
           onDeleteChore={onDeleteChore}
           onViewSubmission={onViewSubmission} 
         />
-      ))}
+       ))
+      )}
     </div>
   );
 }

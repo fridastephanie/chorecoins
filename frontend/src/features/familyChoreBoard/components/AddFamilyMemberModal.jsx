@@ -37,14 +37,15 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
   const isAlreadyMember = foundUser && family.members.some(m => m.id === foundUser.id);
 
   return (
-    <Modal title="Add Family Member" onClose={onClose}>
-      {error && <p className="error">{error}</p>}
-
+    <Modal title="Add Family Member" onClose={onClose}>    
       <input
         placeholder="User email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+
+      {error && <p className="error">{error}</p>}
+      
       <button onClick={handleSearch}>Search</button>
 
       {foundUser && (

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
 import { useUserApi } from "../../../../shared/hooks/useUserApi";
 import InputField from "../../../../shared/components/InputField";
+import { getFirstValidationError } from "../../../../shared/utils/getFirstValidationError";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ export default function RegisterForm() {
     clearError();
 
     if (!isValid()) {
-      showError("Please fix the errors before submitting");
+      const msg = getFirstValidationError(errors);
+      showError(msg || "Please fix the errors before submitting");
       return;
     }
 

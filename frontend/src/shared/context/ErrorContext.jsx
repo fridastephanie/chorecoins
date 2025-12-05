@@ -6,6 +6,12 @@ export const ErrorProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const showError = (err, context = null) => {
+
+    if (typeof err === "string") {
+      setError(err);
+      return;
+    }
+
     if (err?.response) {
       switch (err.response.status) {
         case 400:

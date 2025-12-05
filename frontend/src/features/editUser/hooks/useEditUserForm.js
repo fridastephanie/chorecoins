@@ -90,6 +90,12 @@ export function useEditUserForm(user, onDeleteSuccess) {
 
     const updatedUser = await updateUserData(user.id, payload);
     userCache[user.id] = updatedUser; // Update cache with latest values
+
+    // Update original values so future comparisons work correctly
+    setOriginalValues({
+        firstName: updatedUser.firstName,
+        email: updatedUser.email
+    });
     return updatedUser;
   };
 

@@ -62,8 +62,8 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
       </div>
 
       <div className="modal-actions">
-        <button onClick={handleApprove}>Approve</button>
-        <button className="danger" onClick={handleReject}>Reject</button>
+        <button onClick={handleApprove}>✅ Approve</button>
+        <button className="danger" onClick={handleReject}>❌ Reject</button>
       </div>
     </Modal>
   );

@@ -6,6 +6,7 @@ import ConfirmModal from "../../../shared/components/ConfirmModal";
 import { useError } from "../../../shared/context/ErrorContext";
 import { useAuth } from "../../../shared/context/AuthContext";
 import { useEditUserForm } from "../hooks/useEditUserForm";
+import { getFirstValidationError } from "../../../shared/utils/getFirstValidationError";
 
 export default function EditUserForm() {
   const navigate = useNavigate();
@@ -32,7 +33,8 @@ export default function EditUserForm() {
     clearError();
 
     if (!isValid()) {
-      showError("Please fix the errors before submitting");
+      const msg = getFirstValidationError(errors);
+      showError(msg || "Please fix the errors before submitting");
       return;
     }
 
@@ -108,7 +110,7 @@ export default function EditUserForm() {
         />
         <div className="edit-user-buttons">
             <button type="submit" disabled={loading}>Update User</button>
-            <button type="button" onClick={handleDeleteClick} disabled={loading} className="delete-btn">Delete Account</button>
+            <button type="button" onClick={handleDeleteClick} disabled={loading} className="delete-btn">❌ Delete Account</button>
         </div>
       </form>
 

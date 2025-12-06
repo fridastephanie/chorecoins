@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
-import { getWeeklyStatsForChild } from "../api/weeklyChildStats";
+import { getWeeklyStatsForChild } from "../../api/weeklyChildStats";
 
+/**
+ * Custom hook for fetching weekly stats for a specific child.
+ * Manages loading, error, and provides a reload function to refetch the data.
+ */
 export const useWeeklyChildStatsApi = (childId) => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);

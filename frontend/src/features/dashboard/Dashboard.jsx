@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import NewFamilyModal from "./components/NewFamilyModal";
+import { useMemo } from "react";
+import FamilyList from "./components/FamilyList";
+import NewFamilyButton from "./components/NewFamilyButton";
 import ErrorBanner from "../../shared/components/ErrorBanner";
 import "../../css/features/dashboard.css";
 import boygirlChoreImage from "../../assets/girl_boy_laundry.png";
@@ -28,7 +28,6 @@ export default function Dashboard() {
 
 function DashboardContent({ user }) {
   const { families, error, addFamily } = useFamiliesContext(); 
-  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="dashboard-container">
@@ -40,26 +39,10 @@ function DashboardContent({ user }) {
         className="dashboard-image"
       />
 
-      {/* List of families */}
-      <ul className="family-list">
-        {families.map((f) => (
-          <li key={f.id}>
-            <Link to={`/family-choreboard/${f.id}`}>→ {f.familyName}</Link>
-          </li>
-        ))}
-      </ul>
+      <FamilyList families={families} />
 
-      {/* Only parents can create new families */}
       {user?.role === "PARENT" && (
-        <>
-          <button onClick={() => setShowModal(true)}>New Family</button>
-          {showModal && (
-            <NewFamilyModal
-              onClose={() => setShowModal(false)}
-              onFamilyCreated={addFamily} 
-            />
-          )}
-        </>
+        <NewFamilyButton onFamilyCreated={addFamily} />
       )}
     </div>
   );

@@ -1,67 +1,44 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../shared/context/AuthContext";
-import { useError } from "../../shared/context/ErrorContext";
-import { useFamilyApi } from "../../shared/hooks/useFamilyApi";
-import { useChoreApi } from "../../shared/hooks/useChoreApi";
 import useFamilies from "../dashboard/hooks/useFamilies";
 import { useFamilyChores } from "./hooks/useFamilyChores";
+import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 
-import FamilyHeader from "./components/FamilyHeader";
-import ChoreFilter from "./components/ChoreFilter";
-import ChoreColumn from "./components/ChoreColumn";
-import NewChoreModal from "./components/NewChoreModal";
-import AddFamilyMemberModal from "./components/AddFamilyMemberModal";
-import ChoreSubmissionModal from "./components/ChoreSubmissionModal";
-import ChoreHistoryModal from "./components/ChoreHistoryModal";
-import ViewSubmissionModal from "./components/ViewSubmissionModal";
+import useConfirmModal from "./hooks/useConfirmModal";
+import useFamilyBoardActions from "./hooks/useFamilyBoardActions";
+
+import FamilyHeader from "./components/family/FamilyHeader";
+import ChoreFilter from "./components/chores/ChoreFilter";
+import ChoreColumn from "./components/chores/ChoreColumn";
+import NewChoreModal from "./components/chores/NewChoreModal";
+import AddFamilyMemberModal from "./components/family/AddFamilyMemberModal";
+import ChoreSubmissionModal from "./components/chores/ChoreSubmissionModal";
+import ChoreHistoryModal from "./components/chores/ChoreHistoryModal";
+import ViewSubmissionModal from "./components/chores/ViewSubmissionModal";
 import ConfirmModal from "../../shared/components/ConfirmModal";
 import { FamilyProvider } from "../../shared/context/FamilyContext";
 import "../../css/features/familyChoreBoard.css";
-import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
-
 import familyImage from "../../assets/family_outside.png";
 
 export default function FamilyChoreBoard() {
-  useDocumentTitle("Family Chore Board");  
+  useDocumentTitle("Family Chore Board");
   const { id: familyId } = useParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const { showError } = useError();
   const { removeFamily } = useFamilies(currentUser?.id);
-  const { removeFamilyMemberApi, deleteFamilyApi } = useFamilyApi();
-  const { handleDeleteChore, approveChoreSubmission, rejectChoreSubmission } = useChoreApi();
   const { family, chores, loading, reload } = useFamilyChores(familyId, currentUser);
-  const [filterChildId, setFilterChildId] = useState(null);
 
+  const [filterChildId, setFilterChildId] = useState(null);
   const [newChoreModalOpen, setNewChoreModalOpen] = useState(false);
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
   const [submissionModalData, setSubmissionModalData] = useState(null);
   const [historyModalData, setHistoryModalData] = useState(null);
   const [viewSubmissionData, setViewSubmissionData] = useState(null);
 
-  const [confirmModal, setConfirmModal] = useState({
-    isOpen: false,
-    title: "",
-    message: "",
-    onConfirm: null,
-  });
-
-  const openConfirmModal = ({ title, message, onConfirm }) => {
-    setConfirmModal({
-      isOpen: true,
-      title,
-      message,
-      onConfirm: () => {
-        onConfirm();
-        setConfirmModal({ ...confirmModal, isOpen: false });
-      },
-    });
-  };
-
-  const closeConfirmModal = () => {
-    setConfirmModal({ ...confirmModal, isOpen: false });
-  };
+  const { confirmModal, openConfirmModal, closeConfirmModal } = useConfirmModal();
+  const { handleRemoveMember, handleDeleteFamily, handleDeleteChoreLocal, approveChoreSubmission, rejectChoreSubmission } =
+    useFamilyBoardActions(familyId, currentUser, reload, removeFamily, navigate, openConfirmModal);
 
   if (!currentUser) return <p>Loading user...</p>;
   if (loading) return <p>Loading family data...</p>;
@@ -76,101 +53,33 @@ export default function FamilyChoreBoard() {
     { status: "APPROVED", title: "Approved" },
   ];
 
-  const handleRemoveMember = (memberId) => {
-    const member = family.members.find((m) => m.id === memberId);
-      if (!member) return;
-
-      const isLastParent =
-        member.role === "PARENT" &&
-        family.members.filter((m) => m.role === "PARENT").length === 1;
-
-      if (member.id === currentUser.id && !isLastParent) {
-        showError("You cannot remove yourself while there is another parent in the family.");
-        return;
-      }
-
-      openConfirmModal({
-        title: "Remove Family Member?",
-        message: "Are you sure you want to remove this member?",
-        onConfirm: async () => {
-        try {
-            if (isLastParent) {
-            await deleteFamilyApi(familyId);
-            removeFamily(Number(familyId));
-            navigate("/dashboard", { replace: true });
-            } else {
-            await removeFamilyMemberApi(familyId, member.id);
-            await reload();
-
-            if (member.id === currentUser.id) navigate("/dashboard", { replace: true });
-            }
-        } catch (err) {
-            console.error("Failed to remove member:", err);
-         }
-       },
-    });
-};
-
-  const handleDeleteFamily = () => {
-    openConfirmModal({
-      title: "Delete Family?",
-      message: "Are you sure you want to delete this family? This action cannot be undone.",
-      onConfirm: async () => {
-        await deleteFamilyApi(familyId);
-        removeFamily(Number(familyId));
-        navigate("/dashboard");
-      },
-    });
-  };
-
-  const handleDeleteChoreLocal = (choreId) => {
-    openConfirmModal({
-      title: "Delete Chore?",
-      message: "Are you sure you want to delete this chore?",
-      onConfirm: async () => {
-        await handleDeleteChore(choreId);
-        await reload();
-      },
-    });
-  };
-
   return (
     <div className="family-choreboard">
+      <FamilyProvider>
+        <FamilyHeader
+          family={family}
+          currentUser={currentUser}
+          onAddChore={() => setNewChoreModalOpen(true)}
+          onAddMember={() => setAddMemberModalOpen(true)}
+          onRemoveMember={(id) => handleRemoveMember(family.members.find(m => m.id === id), family.members)}
+          onDeleteFamily={handleDeleteFamily}
+          navigate={navigate}
+        />
+      </FamilyProvider>
 
-      {/* Family header with actions */}
-      {family && (
-        <FamilyProvider>
-           <FamilyHeader
-            family={family}
-            currentUser={currentUser}
-            onAddChore={() => setNewChoreModalOpen(true)}
-            onAddMember={() => setAddMemberModalOpen(true)}
-            onRemoveMember={handleRemoveMember}
-            onDeleteFamily={handleDeleteFamily}
-            navigate={navigate} 
-           />
-        </FamilyProvider>
-      )}
-
-        <img
-        src={familyImage}
-        alt="Family Doing Chores"
-        className="family-image"
-      />
+      <img src={familyImage} alt="Family Doing Chores" className="family-image" />
 
       <div className="family-main-right">
-        {/* Filter chores by child */}
         <ChoreFilter
-            childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
-            filterChildId={filterChildId}
-            setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
+          childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
+          filterChildId={filterChildId}
+          setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
         />
 
-        {/* Chore columns by status */}
         <div className="choreboard-wrapper">
-            <div className="family-choreboard-columns">
+          <div className="family-choreboard-columns">
             {columns.map((col) => (
-                <ChoreColumn
+              <ChoreColumn
                 key={col.status}
                 column={col}
                 chores={filteredChores.filter((c) => c.status === col.status)}
@@ -179,45 +88,29 @@ export default function FamilyChoreBoard() {
                 onViewHistory={(chore) => setHistoryModalData(chore)}
                 onDeleteChore={handleDeleteChoreLocal}
                 onViewSubmission={(data) => setViewSubmissionData(data)}
-                />
+              />
             ))}
-            </div>
-        </div>  
+          </div>
+        </div>
       </div>
 
       {/* Modals */}
       {newChoreModalOpen && (
-        <NewChoreModal
-          family={family}
-          onClose={() => setNewChoreModalOpen(false)}
-          onChoreCreated={async () => await reload()}
-        />
+        <NewChoreModal family={family} onClose={() => setNewChoreModalOpen(false)} onChoreCreated={reload} />
       )}
 
       {addMemberModalOpen && (
-        <AddFamilyMemberModal
-          family={family}
-          onClose={() => setAddMemberModalOpen(false)}
-          onMemberAdded={async () => await reload()}
-        />
+        <AddFamilyMemberModal family={family} onClose={() => setAddMemberModalOpen(false)} onMemberAdded={reload} />
       )}
 
       {submissionModalData && (
-        <ChoreSubmissionModal
-          chore={submissionModalData}
-          onClose={() => setSubmissionModalData(null)}
-          onSubmit={async () => await reload()}
-        />
+        <ChoreSubmissionModal chore={submissionModalData} onClose={() => setSubmissionModalData(null)} onSubmit={reload} />
       )}
 
       {historyModalData && (
-        <ChoreHistoryModal
-          chore={historyModalData}
-          onClose={() => setHistoryModalData(null)}
-        />
+        <ChoreHistoryModal chore={historyModalData} onClose={() => setHistoryModalData(null)} />
       )}
 
-      {/* ViewSubmissionModal for parent to approve/reject latest submission */}
       {viewSubmissionData && (
         <ViewSubmissionModal
           chore={viewSubmissionData.chore}
@@ -240,7 +133,6 @@ export default function FamilyChoreBoard() {
         />
       )}
 
-      {/* ConfirmModal: used for delete confirmations (family, member, chore) */}
       {confirmModal.isOpen && (
         <ConfirmModal
           title={confirmModal.title}

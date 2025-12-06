@@ -1,4 +1,4 @@
-import Modal from "../../../shared/components/Modal";
+import Modal from "../../../../shared/components/Modal";
 
 export default function ChoreHistoryModal({ chore, onClose }) {
   const sortedSubmissions = [...(chore.submissions || [])].sort(

@@ -1,8 +1,9 @@
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
-import { useUserApi } from "../../../../shared/hooks/useUserApi";
+import { useUserApi } from "../../../../shared/hooks/useApi/useUserApi.js";
 import InputField from "../../../../shared/components/InputField";
+import RoleSelect from "./RoleSelect.jsx";
 import { getFirstValidationError } from "../../../../shared/utils/getFirstValidationError";
 
 export default function RegisterForm() {
@@ -11,12 +12,6 @@ export default function RegisterForm() {
   const { form, errors, handleChange, isValid } = useRegisterForm();
   const { registerNewUser, loading } = useUserApi();
 
-  /**
-   * Handles form submission for user registration.
-   * Validates form fields, calls registerNewUser from useUserApi,
-   * and navigates to the login page on success.
-   * Displays any validation or server errors using the error context.
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
@@ -35,72 +30,31 @@ export default function RegisterForm() {
     }
   };
 
+  const fields = [
+    { name: "firstName", placeholder: "First name", type: "text" },
+    { name: "email", placeholder: "Email", type: "email" },
+    { name: "password", placeholder: "Password", type: "password" },
+    { name: "confirmPassword", placeholder: "Confirm password", type: "password" },
+  ];
+
   return (
     <form className="register-form" onSubmit={handleSubmit}>
+      {fields.map((field) => (
         <InputField
-            required
-            name="firstName"
-            placeholder="First name"
-            value={form.firstName}
-            onChange={handleChange}
-            error={errors.firstName}
+          key={field.name}
+          required
+          {...field}
+          value={form[field.name]}
+          onChange={handleChange}
+          error={errors[field.name]}
         />
+      ))}
 
-        <InputField
-            required
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            error={errors.email}
-        />
+      <RoleSelect value={form.role} onChange={handleChange} />
 
-        <InputField
-            required
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            error={errors.password}
-        />
-
-        <InputField
-            required
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm password"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            error={errors.confirmPassword}
-        />
-
-        <div className="role-select">
-            <label>
-            <input
-                type="radio"
-                name="role"
-                value="PARENT"
-                checked={form.role === "PARENT"}
-                onChange={handleChange}
-            /> Parent
-            </label>
-
-            <label>
-            <input
-                type="radio"
-                name="role"
-                value="CHILD"
-                checked={form.role === "CHILD"}
-                onChange={handleChange}
-            /> Child
-            </label>
-        </div>
-
-        <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading}>
         {loading ? "Registering.." : "Register"}
-        </button>
+      </button>
     </form>
   );
 }

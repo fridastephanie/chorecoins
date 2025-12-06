@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useChoreApi } from "../../../shared/hooks/useChoreApi";
-import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
+import { useChoreApi } from "../../../shared/hooks/useApi/useChoreApi";
+import { useFamilyApi } from "../../../shared/hooks/useApi/useFamilyApi";
 
 export const useFamilyChores = (familyId, currentUser) => {
   const { fetchChoresForFamily, fetchChoresForChild } = useChoreApi();

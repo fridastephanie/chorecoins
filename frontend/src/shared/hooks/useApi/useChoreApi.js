@@ -8,8 +8,13 @@ import {
   approveChore,
   rejectChore,
   deleteChore,
-} from "../api/chore";
+} from "../../api/chore";
 
+/**
+ * Custom hook for managing chores via the API.
+ * Handles loading and error states for all operations like
+ * creating, fetching, submitting, approving, rejecting, and deleting chores.
+ */
 export function useChoreApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

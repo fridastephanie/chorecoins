@@ -5,6 +5,14 @@ const ErrorContext = createContext();
 export const ErrorProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
+  /**
+   * Sets an error message to be displayed globally.
+   * Handles different types of errors including:
+   *   - Strings
+   *   - Axios HTTP responses (handles common status codes)
+   *   - JavaScript Error objects
+   *   - Unknown errors
+   */
   const showError = (err, context = null) => {
 
     if (typeof err === "string") {
@@ -46,6 +54,9 @@ export const ErrorProvider = ({ children }) => {
     }
   };
 
+ /**
+   * Clears any currently set global error.
+   */
   const clearError = () => setError(null);
 
   return (
@@ -55,4 +66,7 @@ export const ErrorProvider = ({ children }) => {
   );
 };
 
+/**
+ * Custom hook to access the ErrorContext.
+ */
 export const useError = () => useContext(ErrorContext);

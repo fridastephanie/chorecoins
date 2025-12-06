@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useChoreApi } from "../../../shared/hooks/useChoreApi";
-import Modal from "../../../shared/components/Modal";
+import { useChoreApi } from "../../../../shared/hooks/useApi/useChoreApi";
+import Modal from "../../../../shared/components/Modal";
 
 export default function NewChoreModal({ family, onClose, onChoreCreated }) {
   const { createNewChore } = useChoreApi();

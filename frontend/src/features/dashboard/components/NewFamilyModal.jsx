@@ -2,7 +2,7 @@ import { useState } from "react";
 import Modal from "../../../shared/components/Modal";
 import InputField from "../../../shared/components/InputField"; 
 import { useError } from "../../../shared/context/ErrorContext";
-import { useFamilyApi } from "../../../shared/hooks/useFamilyApi";
+import { useFamilyApi } from "../../../shared/hooks/useApi/useFamilyApi";
 
 export default function NewFamilyModal({ onClose, onFamilyCreated }) {
   const { showError, clearError } = useError();

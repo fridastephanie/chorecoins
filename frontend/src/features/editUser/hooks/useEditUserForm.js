@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "../../../shared/hooks/useForm";
 import { validateFirstName, validateEmail, validatePassword, validateConfirmPassword } from "../../../shared/utils/validation";
-import { useUserApi } from "../../../shared/hooks/useUserApi";
+import { useUserApi } from "../../../shared/hooks/useApi/useUserApi";
 
 const userCache = {}; //Simple in-memory cache for user data keyed by userId
 

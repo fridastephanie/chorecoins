@@ -6,8 +6,14 @@ import {
   updateUser,
   deleteUser,
   getUserFamilies
-} from "../api/user";
+} from "../../api/user";
 
+/**
+ * Custom hook for managing users via the API.
+ * Handles loading and error states for operations like
+ * registering, fetching, updating, and deleting users,
+ * as well as fetching the families a user belongs to.
+ */
 export function useUserApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

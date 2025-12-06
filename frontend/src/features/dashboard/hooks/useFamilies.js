@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useUserApi } from "../../../shared/hooks/useUserApi";
+import { useUserApi } from "../../../shared/hooks/useApi/useUserApi";
 
 const familyCache = {}; // Simple in-memory cache keyed by userId
 

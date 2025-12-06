@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWeeklyStatsForChild } from "../../../shared/api/weeklyChildStats";
+import { getWeeklyStatsForChild } from "../../../../shared/api/weeklyChildStats";
 
 export function useAllChildrenStats(children, familyId) {
   const [allStats, setAllStats] = useState([]);
@@ -12,6 +12,11 @@ export function useAllChildrenStats(children, familyId) {
 
     let cancelled = false;
 
+  /**
+   * Loads weekly stats for all child members in the family.
+   * Filters stats by familyId and sets the current week's stat.
+   * Cancels state update if the component is unmounted.
+   */
     const loadStats = async () => {
       const statsArray = await Promise.all(
         children.map(async (child) => {

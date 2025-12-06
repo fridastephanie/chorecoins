@@ -6,8 +6,14 @@ import {
   updateFamilyName,
   deleteFamily,
   getFamily,
-} from "../api/family";
+} from "../../api/family";
 
+/**
+ * Custom hook for managing families via the API.
+ * Handles loading and error states for operations like
+ * creating, fetching, updating, and deleting families,
+ * as well as adding or removing family members.
+ */
 export function useFamilyApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

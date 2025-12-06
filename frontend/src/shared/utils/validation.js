@@ -1,3 +1,6 @@
+/**
+ * Validates first name: must start with uppercase and contain only letters.
+ */
 export const validateFirstName = (name) => {
   const nameRegex = /^[A-Z][a-z]+$/;
   return [
@@ -5,6 +8,9 @@ export const validateFirstName = (name) => {
   ];
 };
 
+/**
+ * Validates email format: must include "@" and ".".
+ */
 export const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return [
@@ -12,6 +18,9 @@ export const validateEmail = (email) => {
   ];
 };
 
+/**
+ * Validates password: min 6 characters, at least 1 uppercase letter, and 1 number.
+ */
 export const validatePassword = (password) => {
   return [
     { text: "Min 6 characters", isValid: password.length >= 6 },
@@ -20,6 +29,9 @@ export const validatePassword = (password) => {
   ];
 };
 
+/**
+ * Validates that confirm password matches the original password.
+ */
 export const validateConfirmPassword = (password, confirmPassword) => {
   if (!confirmPassword) return []; 
   return [

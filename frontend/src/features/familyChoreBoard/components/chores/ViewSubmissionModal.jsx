@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Modal from "../../../shared/components/Modal";
+import Modal from "../../../../shared/components/Modal";
 
 export default function ViewSubmissionModal({ chore, submission, onClose, onDecision }) {
 

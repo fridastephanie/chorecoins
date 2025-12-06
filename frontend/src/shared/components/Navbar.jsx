@@ -14,15 +14,25 @@ export default function Navbar() {
   if (!user) return null;
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" aria-label="Main navigation">
       <div className="navbar_top">
         <span>Welcome {user.firstName}</span>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
+        <button
+          onClick={handleLogout}
+          className="logout-btn"
+          aria-label="Logout"
+        >
+          Logout
+        </button>
       </div>
       <div className="navbar_bottom">
-        <button onClick={() => navigate("/dashboard")}>Dashboard</button>
-        <button onClick={() => navigate(`/edit-user/${user.id}`)}>Edit User</button>
+        <button onClick={() => navigate("/dashboard")} aria-label="Go to dashboard">
+          Dashboard
+        </button>
+        <button onClick={() => navigate(`/edit-user/${user.id}`)} aria-label="Edit user profile">
+          Edit User
+        </button>
       </div>
-  </nav>
+    </nav>
   );
 }

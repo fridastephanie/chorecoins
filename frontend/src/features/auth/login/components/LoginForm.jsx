@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "../../../../shared/context/AuthContext";
 import { useError } from "../../../../shared/context/ErrorContext";
 import { useLoginForm } from "../hooks/useLoginForm";
@@ -7,6 +8,10 @@ export default function LoginForm() {
   const { login } = useAuth();
   const { showError, clearError } = useError();
   const { credentials, handleChange } = useLoginForm();
+
+  useEffect(() => {
+    document.getElementById("email")?.focus(); 
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,25 +26,35 @@ export default function LoginForm() {
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
-      <InputField
-        required
-        name="email"
-        type="email"
-        placeholder="Email"
-        value={credentials.email}
-        onChange={handleChange}
-      />
+      <div className="input-group">
+        <label htmlFor="email">Email</label>
+        <InputField
+          id="email"
+          required
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={credentials.email}
+          onChange={handleChange}
+          aria-required="true"
+        />
+      </div>
 
-      <InputField
-        required
-        name="password"
-        type="password"
-        placeholder="Password"
-        value={credentials.password}
-        onChange={handleChange}
-      />
+      <div className="input-group">
+        <label htmlFor="password">Password</label>
+        <InputField
+          id="password"
+          required
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={credentials.password}
+          onChange={handleChange}
+          aria-required="true"
+        />
+      </div>
 
-      <button type="submit">Login</button>
+      <button type="submit" aria-label="Login">Login</button>
     </form>
   );
 }

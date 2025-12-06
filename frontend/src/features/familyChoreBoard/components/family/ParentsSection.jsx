@@ -1,23 +1,24 @@
 export default function ParentsSection({ parents, currentUser, onRemoveMember }) {
   return (
-    <div className="parents-section">
+    <section className="parents-section" aria-label="Parents list">
       <strong>Parents</strong>
-      <div className="member-cards">
+      <div className="member-cards" role="list">
         {parents.map(p => (
-          <div key={p.id} className="member-card">
+          <article key={p.id} className="member-card" role="listitem" aria-label={`Parent ${p.firstName}`}>
             <span className="member-name">{p.firstName}</span>
             {currentUser.role === "PARENT" && (
               <button
-                title="Remove From Family"
+                title={`Remove ${p.firstName} from family`}
                 className="remove-btn"
                 onClick={() => onRemoveMember(p.id)}
+                aria-label={`Remove ${p.firstName} from family`}
               >
                 Remove
               </button>
             )}
-          </div>
+          </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

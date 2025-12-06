@@ -8,20 +8,27 @@ export default function ChoreHistoryModal({ chore, onClose }) {
     () => [...(chore.submissions || [])].sort((a, b) => a.id - b.id),
     [chore.submissions]
   );
-
   return (
-    <Modal title={`History for: ${chore.title}`} onClose={onClose}>
+    <Modal
+      title={`History for: ${chore.title}`}
+      onClose={onClose}
+      ariaLabel={`Chore history for ${chore.title}`}
+    >
+      {sortedSubmissions.length === 0 && <p aria-live="polite">No submissions yet.</p>}
+
       {sortedSubmissions.map((sub) => {
         const { imageUrlsMap } = useFetchImages(sub.imageUrls);
 
         return (
-          <div key={sub.id} className="submission-history">
-            <p><strong>Child comment:</strong> {sub.commentChild || "—"}</p>
+          <section key={sub.id} className="submission-history" aria-labelledby={`submission-${sub.id}-title`}>            
+
             <ImagePreviewGrid urls={sub.imageUrls?.map(fn => imageUrlsMap[fn])} />
-            <p><strong>Parent comment:</strong> {sub.commentParent || "—"}</p>
-            <p>Status: {sub.approvedByParent ? "Approved" : "Not Approved"}</p>
+
+            <p><strong>Child comment:</strong> {sub.commentChild || "-"}</p>
+            <p><strong>Parent comment:</strong> {sub.commentParent || "-"}</p>
+            <p><strong>Status:</strong> {sub.approvedByParent ? "Approved" : "Not Approved"}</p>
             <hr />
-          </div>
+          </section>
         );
       })}
     </Modal>

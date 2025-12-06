@@ -6,6 +6,7 @@ export default function ChoreFilter({ childrenList, filterChildId, setFilterChil
         id="childFilter"
         value={filterChildId || ""}
         onChange={(e) => setFilterChildId(e.target.value || null)}
+        aria-label="Filter chores by child"
       >
         <option value="">All</option>
         {childrenList.map((child) => (

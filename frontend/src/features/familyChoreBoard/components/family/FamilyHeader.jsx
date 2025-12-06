@@ -10,18 +10,23 @@ export default function FamilyHeader({ family, currentUser, onAddChore, onAddMem
   const { parents, childrenStats } = useFamilyMembers(family.members, family.id);
 
   return (
-    <div className="family-header">
-      <h1>Week {currentWeek}</h1>      
+    <header className="family-header">
+      <h1 aria-label={`Current week: ${currentWeek}`}>Week {currentWeek}</h1>      
 
-      <div className="family-wrapper">
+      <section className="family-wrapper" aria-label="Family information">
         <div className="family-info">
-          <h1>✨{family.familyName}’s Chore Board✨</h1>          
+          <h2>✨{family.familyName}’s Chore Board✨</h2>          
           <ParentsSection parents={parents} currentUser={currentUser} onRemoveMember={onRemoveMember} />
           <ChildrenSection childrenStats={childrenStats} currentUser={currentUser} onRemoveMember={onRemoveMember} />
         </div>
-      </div>
+      </section>
 
-      <FamilyActions currentUser={currentUser} onAddChore={onAddChore} onAddMember={onAddMember} onDeleteFamily={onDeleteFamily} />
-    </div>
+      <FamilyActions
+        currentUser={currentUser}
+        onAddChore={onAddChore}
+        onAddMember={onAddMember}
+        onDeleteFamily={onDeleteFamily}
+      />
+    </header>
   );
 }

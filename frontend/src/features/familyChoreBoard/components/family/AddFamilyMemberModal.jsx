@@ -17,10 +17,27 @@ export default function AddFamilyMemberModal({ family, onClose, onMemberAdded })
   const isAlreadyMember = foundUser && family.members.some(m => m.id === foundUser.id);
 
   return (
-    <Modal title="Add Family Member" onClose={onClose}>
-      <MemberSearchInput email={email} setEmail={setEmail} onSearch={handleSearch} />
-      {error && <p className="error">{error}</p>}
-      {foundUser && <FoundUserCard user={foundUser} onAdd={handleAdd} isAlreadyMember={isAlreadyMember} />}
+    <Modal title="Add Family Member" onClose={onClose} ariaLabel="Add family member modal">
+      <div className="member-search input-group">
+        <MemberSearchInput
+          id="member-email"
+          labelText="Enter email to search:" 
+          email={email}
+          setEmail={setEmail}
+          onSearch={handleSearch}
+        />
+      </div>
+
+      {error && <p className="error" role="alert" aria-live="polite">{error}</p>}
+
+      {foundUser && (
+        <FoundUserCard
+          user={foundUser}
+          onAdd={handleAdd}
+          isAlreadyMember={isAlreadyMember}
+          aria-label={`User card for ${foundUser.firstName} ${foundUser.lastName}`}
+        />
+      )}
     </Modal>
   );
 }

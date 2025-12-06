@@ -30,48 +30,80 @@ export default function NewChoreModal({ family, onClose, onChoreCreated }) {
   };
 
   return (
-    <Modal title="New Chore" onClose={onClose}>
-      {error && <p className="error">{error}</p>}
+    <Modal title="New Chore" onClose={onClose} ariaLabel="Create new chore modal">
+      {error && (
+        <p className="error" role="alert" aria-live="polite">
+          {error}
+        </p>
+      )}
+
       <form onSubmit={handleSubmit}>
-        <input
-          required
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          required
-          type="number"
-          min="0"
-          placeholder="Value"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-        <input
-          type="date"
-          min={new Date().toISOString().split("T")[0]}
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-        />
-        <select
-          required
-          value={assignedChildId}
-          onChange={(e) => setAssignedChildId((e.target.value))}
-        >
-          <option value="">Assign to ..</option>
-          {family.members
-            .filter((m) => m.role === "CHILD")
-            .map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.firstName}
-              </option>
-            ))}
-        </select>
+        <div className="form-group">
+          <label htmlFor="chore-title">Title *</label>
+          <input
+            id="chore-title"
+            type="text"
+            required
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="chore-description">Description</label>
+          <textarea
+            id="chore-description"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="chore-value">Value *</label>
+          <input
+            id="chore-value"
+            type="number"
+            min="0"
+            required
+            placeholder="Value"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="chore-dueDate">Due Date</label>
+          <input
+            id="chore-dueDate"
+            type="date"
+            min={new Date().toISOString().split("T")[0]}
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="chore-assigned">Assign to *</label>
+          <select
+            id="chore-assigned"
+            required
+            value={assignedChildId}
+            onChange={(e) => setAssignedChildId(e.target.value)}
+            aria-label="Select child to assign chore"
+          >
+            <option value="">Select child...</option>
+            {family.members
+              .filter((m) => m.role === "CHILD")
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.firstName}
+                </option>
+              ))}
+          </select>
+        </div>
+
         <button type="submit">Create Chore</button>
       </form>
     </Modal>

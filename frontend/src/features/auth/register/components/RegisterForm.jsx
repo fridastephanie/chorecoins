@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../../../shared/context/ErrorContext.jsx";
@@ -12,6 +13,10 @@ export default function RegisterForm() {
   const { form, errors, handleChange, isValid } = useRegisterForm();
   const { registerNewUser, loading } = useUserApi();
 
+   useEffect(() => {
+    document.getElementById("firstName")?.focus(); 
+   }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
@@ -20,6 +25,11 @@ export default function RegisterForm() {
       const msg = getFirstValidationError(errors);
       showError(msg || "Please fix the errors before submitting");
       return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+        showError("Password and Confirm Password must match");
+        return;
     }
 
     try {
@@ -40,20 +50,29 @@ export default function RegisterForm() {
   return (
     <form className="register-form" onSubmit={handleSubmit}>
       {fields.map((field) => (
-        <InputField
-          key={field.name}
-          required
-          {...field}
-          value={form[field.name]}
-          onChange={handleChange}
-          error={errors[field.name]}
-        />
+        <div className="input-group" key={field.name}>
+          <label htmlFor={field.name}>{field.placeholder}</label>
+          <InputField
+            id={field.name}
+            required
+            {...field}
+            value={form[field.name]}
+            onChange={handleChange}
+            aria-required="true"
+            error={errors[field.name]}
+          />
+        </div>
       ))}
 
       <RoleSelect value={form.role} onChange={handleChange} />
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Registering.." : "Register"}
+      <button 
+        type="submit" 
+        disabled={loading}
+        aria-busy={loading ? "true" : "false"}
+        aria-label="Register user"
+      >
+        {loading ? "Registering..." : "Register"}
       </button>
     </form>
   );

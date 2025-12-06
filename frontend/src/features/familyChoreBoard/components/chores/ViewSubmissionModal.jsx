@@ -7,44 +7,44 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
   const latestSubmission = submission ?? chore?.submissions?.[chore.submissions?.length - 1];
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
-
   const { imageUrlsMap } = useFetchImages(latestSubmission?.imageUrls);
 
   if (!latestSubmission) {
-    return <Modal title="No submission found" onClose={onClose}><p>No submission available.</p></Modal>;
+    return (
+      <Modal title="No submission found" onClose={onClose} ariaLabel="No submission available">
+        <p aria-live="polite">No submission available.</p>
+      </Modal>
+    );
   }
 
-  const handleApprove = () => {
+  const handleDecision = (decision) => {
     if (!comment.trim()) return setError("Comment is required.");
-    onDecision("APPROVE", comment, latestSubmission);
-    onClose();
-  };
-
-  const handleReject = () => {
-    if (!comment.trim()) return setError("Comment is required.");
-    onDecision("REJECT", comment, latestSubmission);
+    onDecision(decision, comment, latestSubmission);
     onClose();
   };
 
   return (
-    <Modal title={`Submission for ${chore?.title || "chore"}`} onClose={onClose}>
-      {error && <p className="error">{error}</p>}
+    <Modal title={`Submission for ${chore?.title || "chore"}`} onClose={onClose} ariaLabel={`Submission details for ${chore?.title}`}>
+      {error && <p className="error" role="alert">{error}</p>}
 
       <p><strong>Submitted at:</strong> {latestSubmission?.submittedAt ? new Date(latestSubmission.submittedAt).toLocaleString() : "Unknown"}</p>
       <p><strong>Child's message:</strong> {latestSubmission?.commentChild || "No message"}</p>
 
       <ImagePreviewGrid urls={latestSubmission?.imageUrls?.map(fn => imageUrlsMap[fn])} />
 
-      <div>
-        <label>
-          Parent comment (required):
-          <textarea value={comment} onChange={e => setComment(e.target.value)} required />
-        </label>
+      <div className="input-group">
+        <label htmlFor="parent-comment">Parent comment (required):</label>
+        <textarea
+          id="parent-comment"
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          required
+        />
       </div>
 
       <div className="modal-actions">
-        <button onClick={handleApprove}>✅ Approve</button>
-        <button className="danger" onClick={handleReject}>❌ Reject</button>
+        <button onClick={() => handleDecision("APPROVE")}>✅ Approve</button>
+        <button className="danger" onClick={() => handleDecision("REJECT")}>❌ Reject</button>
       </div>
     </Modal>
   );

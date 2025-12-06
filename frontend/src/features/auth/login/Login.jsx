@@ -11,7 +11,7 @@ export default function Login() {
     <div className="login-container">
       <img 
         src={girlDishwasherImage} 
-        alt="Girl emptying dishwasher" 
+        alt="Illustration of a girl emptying dishwasher" 
         className="login-image" 
       />
       <h2 className="login-title">Login</h2>

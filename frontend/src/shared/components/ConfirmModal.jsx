@@ -9,11 +9,24 @@ export default function ConfirmModal({
   cancelText = "Cancel" 
 }) {
   return (
-    <Modal title={title} onClose={onCancel}>
+    <Modal title={title} onClose={onCancel} ariaLabel={title}>
       <p>{message}</p>
-      <div className="confirm-modal-buttons">
-        <button type="button" onClick={onConfirm} className="delete-btn">{confirmText}</button>
-        <button type="button" onClick={onCancel}>{cancelText}</button>
+      <div className="confirm-modal-buttons" role="group" aria-label="Confirmation actions">
+        <button 
+          type="button" 
+          onClick={onConfirm} 
+          className="delete-btn"
+          aria-label={confirmText}
+        >
+          {confirmText}
+        </button>
+        <button 
+          type="button" 
+          onClick={onCancel}
+          aria-label={cancelText}
+        >
+          {cancelText}
+        </button>
       </div>
     </Modal>
   );

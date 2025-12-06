@@ -16,23 +16,36 @@ export default function ChoreActions({
     : null;
 
   return (
-    <div className="chore-actions">
-      {hasSubmissions && <button onClick={() => onViewHistory(chore)}>History</button>}
+    <div className="chore-actions" role="group" aria-label={`Actions for chore ${chore.title}`}>
+      {hasSubmissions && (
+        <button onClick={() => onViewHistory(chore)} aria-label={`View history of ${chore.title}`}>
+          History
+        </button>
+      )}
 
       {isParent && (
-        <button className="remove-btn" onClick={() => onDeleteChore(chore.id)}>
+        <button
+          className="remove-btn"
+          onClick={() => onDeleteChore(chore.id)}
+          aria-label={`Remove chore ${chore.title}`}
+        >
           Remove
         </button>
       )}
 
       {isParent && chore.status === "DONE" && hasSubmissions && (
-        <button onClick={() => onViewSubmission({ chore, submission: latestSubmission })}>
+        <button
+          onClick={() => onViewSubmission({ chore, submission: latestSubmission })}
+          aria-label={`View submission for ${chore.title}`}
+        >
           View
         </button>
       )}
 
       {isChildAssigned && chore.status === "NOT_STARTED" && (
-        <button onClick={() => onSubmit(chore)}>Submit</button>
+        <button onClick={() => onSubmit(chore)} aria-label={`Submit chore ${chore.title}`}>
+          Submit
+        </button>
       )}
     </div>
   );

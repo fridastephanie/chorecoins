@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "../../../shared/components/InputField";
 import Modal from "../../../shared/components/Modal";
@@ -19,6 +19,12 @@ export default function EditUserForm() {
   const messageModal = useModal();
   const [messageModalContent, setMessageModalContent] = useState("");
 
+  const firstInputRef = useRef(null);
+
+  useEffect(() => {
+    firstInputRef.current?.focus(); 
+  }, []);
+
   const { values, errors, handleChange, isValid, handleUpdate, loading } =
     useEditUserForm(user, () => {
       logout();
@@ -38,6 +44,11 @@ export default function EditUserForm() {
       const msg = getFirstValidationError(errors);
       showError(msg || "Please fix the errors before submitting");
       return;
+    }
+
+    if (values.password !== values.confirmPassword) {
+       showError("Password and Confirm Password must match");
+       return;
     }
 
     try {
@@ -68,31 +79,45 @@ export default function EditUserForm() {
     { name: "confirmPassword", label: "Confirm New Password", placeholder: "Confirm new password", type: "password" },
   ];
 
-  return (
+ return (
     <>
       <form onSubmit={handleSubmit}>
-        {fields.map((field) => (
-          <InputField
-            key={field.name}
-            {...field}
-            value={values[field.name]}
-            onChange={handleChange}
-            error={errors[field.name]}
-          />
+        {fields.map((field, idx) => (
+            <div className="input-group" key={field.name}>
+                <InputField
+                    id={field.name}
+                    {...field}
+                    value={values[field.name]}
+                    onChange={handleChange}
+                    error={errors[field.name]}
+                    aria-required={field.name !== "password" && field.name !== "confirmPassword"}
+                    label={field.label} 
+                    ref={idx === 0 ? firstInputRef : null}
+                />
+            </div>
         ))}
 
         <div className="edit-user-buttons">
-          <button type="submit" disabled={loading}>Update User</button>
-          <button
+            <button 
+            type="submit" 
+            disabled={loading} 
+            aria-busy={loading ? "true" : "false"}
+            aria-label="Update user information"
+            >
+            Update User
+            </button>
+
+            <button
             type="button"
             onClick={deleteModal.open}
             disabled={loading}
             className="delete-btn"
-          >
+            aria-label="Delete your account"
+            >
             ❌ Delete Account
-          </button>
+            </button>
         </div>
-      </form>
+    </form>
 
       {/* Modals */}
       {deleteModal.isOpen && (
@@ -103,13 +128,23 @@ export default function EditUserForm() {
           onCancel={deleteModal.close}
           confirmText="Yes, Delete"
           cancelText="Cancel"
+          ariaLabel="Confirm account deletion modal"
         />
       )}
 
       {messageModal.isOpen && (
-        <Modal title="Information" onClose={messageModal.close}>
+        <Modal 
+          title="Information" 
+          onClose={messageModal.close} 
+          ariaLabel="Information modal"
+        >
           <p>{messageModalContent}</p>
-          <button onClick={messageModal.close}>OK</button>
+          <button 
+            onClick={messageModal.close} 
+            aria-label="Close information modal"
+          >
+            OK
+          </button>
         </Modal>
       )}
     </>

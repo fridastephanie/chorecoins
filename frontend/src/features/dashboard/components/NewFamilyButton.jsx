@@ -6,7 +6,13 @@ export default function NewFamilyButton({ onFamilyCreated }) {
 
   return (
     <>
-      <button onClick={() => setShowModal(true)}>New Family</button>
+      <button 
+        onClick={() => setShowModal(true)}
+        aria-label="Create a new family"
+      >
+        New Family
+      </button>
+      
       {showModal && (
         <NewFamilyModal
           onClose={() => setShowModal(false)}

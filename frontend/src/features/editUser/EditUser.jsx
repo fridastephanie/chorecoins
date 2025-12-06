@@ -6,7 +6,7 @@ export default function EditUser() {
   useDocumentTitle("Edit User");
   return (
     <div className="edit-user-container">
-      <h1>Edit User</h1>
+      <h2>Edit User</h2>
       <EditUserForm />
     </div>
   );

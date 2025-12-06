@@ -5,10 +5,10 @@ import "../../css/shared/loggedInLayout.css";
 export default function LoggedInLayout() {
   return (
     <>
-      <Navbar />      
-      <div className="layout-container">
+      <Navbar />
+      <main className="layout-container">
         <Outlet />
-      </div>
+      </main>
     </>
   );
 }

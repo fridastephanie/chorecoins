@@ -32,10 +32,10 @@ function DashboardContent({ user }) {
   return (
     <div className="dashboard-container">
       <ErrorBanner message={error} />
-      <h1>Dashboard</h1>
+      <h2>Dashboard</h2>
       <img
         src={boygirlChoreImage}
-        alt="Girl and boy doing laundry"
+        alt="Illustration of a girl and boy doing laundry"
         className="dashboard-image"
       />
 

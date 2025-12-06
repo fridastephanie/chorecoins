@@ -2,10 +2,10 @@ export default function FamilyActions({ currentUser, onAddChore, onAddMember, on
   if (currentUser.role !== "PARENT") return null;
 
   return (
-    <div className="family-actions">
-      <button onClick={onAddChore}>New Chore</button>
-      <button onClick={onAddMember}>Add Family Member</button>
-      <button className="remove-btn" onClick={onDeleteFamily}>Remove Family</button>
+    <div className="family-actions" role="group" aria-label="Family management actions">
+      <button onClick={onAddChore} aria-label="Create a new chore">New Chore</button>
+      <button onClick={onAddMember} aria-label="Add a new family member">Add Family Member</button>
+      <button className="remove-btn" onClick={onDeleteFamily} aria-label="Remove family">Remove Family</button>
     </div>
   );
 }

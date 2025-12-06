@@ -1,6 +1,7 @@
 .family-choreboard {    
   max-width: 1300px;  
   margin: 0 auto;     
+  text-align: center;
 }
 
 .family-choreboard > .family-header {
@@ -26,7 +27,7 @@
   margin: 0 auto;
 }
 
-.family-wrapper h1 {
+.family-wrapper h2 {
   margin-bottom: 0rem; 
 }
 
@@ -46,7 +47,7 @@
 }
 
 .parents-section {
-  margin-bottom: 0.7rem; 
+  margin-bottom: 0.5rem; 
 }
 
 .children-section {
@@ -185,8 +186,9 @@
   gap: 1rem;  
 }
 
-.chore-column > h2 {
+h3 {
   text-align: center; 
+  font-size: 1.8rem;
 }
 
 .chore-card {
@@ -245,6 +247,10 @@
 .no-chores {
     text-align: center;
     font-style: italic;
+}
+
+.chore-submit label{
+    margin-bottom: 0;
 }
 
 .submission-image {

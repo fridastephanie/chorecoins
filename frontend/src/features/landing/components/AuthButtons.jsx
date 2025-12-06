@@ -4,14 +4,22 @@ export default function AuthButtons() {
   const navigate = useNavigate();
 
   return (
-    <div className="landing-buttons">
-      <button className="landing-btn" onClick={() => navigate("/login")}>
+    <nav className="landing-buttons" aria-label="Authentication actions">
+      <button
+        className="landing-btn"
+        onClick={() => navigate("/login")}
+        aria-label="Go to login page"
+      >
         Login
       </button>
 
-      <button className="landing-btn" onClick={() => navigate("/register")}>
+      <button
+        className="landing-btn"
+        onClick={() => navigate("/register")}
+        aria-label="Go to register page"
+      >
         Register
       </button>
-    </div>
+    </nav>
   );
 }

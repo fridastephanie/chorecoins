@@ -6,17 +6,17 @@ export default function ChildrenSection({ childrenStats, currentUser, onRemoveMe
 
   return (
     <>
-      <div className="children-section">
+      <section className="children-section" aria-label="Children list">
         <strong>Children</strong>
         <div className="member-cards">
           {childrenStats.map(({ child, stats, currentWeekStat }) => (
-            <div key={child.id} className="member-card child-card">
-              <span className="member-name">{child.firstName}</span>
+            <article key={child.id} className="member-card child-card" aria-labelledby={`child-name-${child.id}`}>
+              <span id={`child-name-${child.id}`} className="member-name">{child.firstName}</span>
 
               <div className="stats">
                 <div>
                   <span className="label">Completed Chores:</span>{" "}
-                  {currentWeekStat.completedChoresCount || 0}
+                  {currentWeekStat.completedChoresCount || 0}{", "}
                 </div>
                 <div>
                   <span className="label">Earned Coins:</span>{" "}
@@ -25,20 +25,27 @@ export default function ChildrenSection({ childrenStats, currentUser, onRemoveMe
               </div>
 
               <div className="member-actions">
-                <button onClick={() => setSelectedChildStats({ child, stats })}>History</button>
+                <button
+                  onClick={() => setSelectedChildStats({ child, stats })}
+                  aria-label={`View weekly history for ${child.firstName}`}
+                >
+                  History
+                </button>
+
                 {currentUser.role === "PARENT" && (
                   <button
                     className="remove-btn"
                     onClick={() => onRemoveMember(child.id)}
+                    aria-label={`Remove ${child.firstName} from family`}
                   >
                     Remove
                   </button>
                 )}
               </div>
-            </div>
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
       {selectedChildStats && (
         <ChildWeeklyStatsModal

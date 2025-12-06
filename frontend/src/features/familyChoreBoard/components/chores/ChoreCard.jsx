@@ -19,8 +19,8 @@ export default function ChoreCard({
   onViewSubmission,
 }) {
   return (
-    <div className="chore-card">
-      <h3>{chore.title}</h3>
+    <article className="chore-card" aria-labelledby={`chore-title-${chore.id}`}>
+      <h3 id={`chore-title-${chore.id}`}>{chore.title}</h3>
       <p>{chore.description}</p>
       <p>
         <strong>Value:</strong> {chore.value}
@@ -42,6 +42,6 @@ export default function ChoreCard({
         onDeleteChore={onDeleteChore}
         onViewSubmission={onViewSubmission}
       />
-    </div>
+    </article>
   );
 }

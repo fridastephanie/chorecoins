@@ -37,8 +37,8 @@ body {
   flex-direction: column;
 }
 
-/* H1 */
-h1 {
+/* H2 */
+h2 {
   margin-bottom: 1rem;
   font-size: 2rem;
   color: var(--brown);
@@ -116,6 +116,21 @@ hr {
   margin: 0.5rem 0;
 }
 
+.input-group label{
+  margin-left: 1rem;
+  font-style: italic;
+  margin-bottom: 0.2rem;
+}
+
+fieldset {
+  border: none;
+}
+
+legend {
+  font-style: italic;
+  font-weight: bold;
+}
+
 /* iPad */
 @media (min-width: 768px) {
   body {
@@ -126,7 +141,7 @@ hr {
 /* Desktop */
 @media (min-width: 1024px) {
   body {
-    h1 {
+    h2 {
       font-size: 2.5rem;
     }
   }

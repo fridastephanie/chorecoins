@@ -38,11 +38,18 @@
   width: 100%;
 }
 
+.role-select {    
+  display: flex;
+  flex-direction: row !important;
+  gap: 4rem !important;
+}
+
 .role-select {
   display: flex;
-  flex-direction: column; 
-  gap: 0.5rem;           
+  flex-direction: column;
+  gap: 0.6rem;           
   margin-bottom: 1rem;
+  margin-left: 1rem;
 }
 
 .role-select label {
@@ -86,10 +93,10 @@
   .register-container img.register-image {
   width: 300px;
   }
-   .role-select {
-    flex-direction: row !important;
-    justify-content: center;
-    gap: 6rem;
+  
+  .role-select {
+    flex-direction: column !important;
+    gap: 0.6rem !important;    
   }
 }
 

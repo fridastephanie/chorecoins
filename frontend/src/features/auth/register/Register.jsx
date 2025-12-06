@@ -10,7 +10,7 @@ export default function Register() {
     <div className="register-container">
       <img 
         src={boyVacuumImage} 
-        alt="Boy Vacuuming" 
+        alt="Illustration of a boy vacuuming" 
         className="register-image" 
       />
       <h2 className="register-title">Register</h2>

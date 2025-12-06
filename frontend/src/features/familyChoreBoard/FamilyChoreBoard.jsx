@@ -40,8 +40,8 @@ export default function FamilyChoreBoard() {
   const { handleRemoveMember, handleDeleteFamily, handleDeleteChoreLocal, approveChoreSubmission, rejectChoreSubmission } =
     useFamilyBoardActions(familyId, currentUser, reload, removeFamily, navigate, openConfirmModal);
 
-  if (!currentUser) return <p>Loading user...</p>;
-  if (loading) return <p>Loading family data...</p>;
+  if (!currentUser) return <p aria-live="polite">Loading user...</p>;
+  if (loading) return <p aria-live="polite">Loading family data...</p>;
 
   const filteredChores = filterChildId
     ? chores.filter((c) => c.assignedTo?.id === filterChildId)
@@ -54,26 +54,33 @@ export default function FamilyChoreBoard() {
   ];
 
   return (
-    <div className="family-choreboard">
+    <main className="family-choreboard">
       <FamilyProvider>
-        <FamilyHeader
-          family={family}
-          currentUser={currentUser}
-          onAddChore={() => setNewChoreModalOpen(true)}
-          onAddMember={() => setAddMemberModalOpen(true)}
-          onRemoveMember={(id) => handleRemoveMember(family.members.find(m => m.id === id), family.members)}
-          onDeleteFamily={handleDeleteFamily}
-          navigate={navigate}
-        />
+        <header>
+          <FamilyHeader
+            family={family}
+            currentUser={currentUser}
+            onAddChore={() => setNewChoreModalOpen(true)}
+            onAddMember={() => setAddMemberModalOpen(true)}
+            onRemoveMember={(id) => handleRemoveMember(family.members.find(m => m.id === id), family.members)}
+            onDeleteFamily={handleDeleteFamily}
+            navigate={navigate}
+          />
+        </header>
       </FamilyProvider>
 
-      <img src={familyImage} alt="Family Doing Chores" className="family-image" />
+      <img
+        src={familyImage}
+        alt="Family doing chores outside home"
+        className="family-image"
+      />
 
-      <div className="family-main-right">
+      <section className="family-main-right" aria-label="Chore Board">
         <ChoreFilter
           childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
           filterChildId={filterChildId}
           setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
+          aria-label="Filter chores by child"
         />
 
         <div className="choreboard-wrapper">
@@ -88,27 +95,47 @@ export default function FamilyChoreBoard() {
                 onViewHistory={(chore) => setHistoryModalData(chore)}
                 onDeleteChore={handleDeleteChoreLocal}
                 onViewSubmission={(data) => setViewSubmissionData(data)}
+                aria-label={`${col.title} column`}
               />
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Modals */}
       {newChoreModalOpen && (
-        <NewChoreModal family={family} onClose={() => setNewChoreModalOpen(false)} onChoreCreated={reload} />
+        <NewChoreModal
+          family={family}
+          onClose={() => setNewChoreModalOpen(false)}
+          onChoreCreated={reload}
+          aria-label="Add new chore modal"
+        />
       )}
 
       {addMemberModalOpen && (
-        <AddFamilyMemberModal family={family} onClose={() => setAddMemberModalOpen(false)} onMemberAdded={reload} />
+        <AddFamilyMemberModal
+          family={family}
+          onClose={() => setAddMemberModalOpen(false)}
+          onMemberAdded={reload}
+          aria-label="Add family member modal"
+        />
       )}
 
       {submissionModalData && (
-        <ChoreSubmissionModal chore={submissionModalData} onClose={() => setSubmissionModalData(null)} onSubmit={reload} />
+        <ChoreSubmissionModal
+          chore={submissionModalData}
+          onClose={() => setSubmissionModalData(null)}
+          onSubmit={reload}
+          aria-label="Submit chore modal"
+        />
       )}
 
       {historyModalData && (
-        <ChoreHistoryModal chore={historyModalData} onClose={() => setHistoryModalData(null)} />
+        <ChoreHistoryModal
+          chore={historyModalData}
+          onClose={() => setHistoryModalData(null)}
+          aria-label="Chore history modal"
+        />
       )}
 
       {viewSubmissionData && (
@@ -130,6 +157,7 @@ export default function FamilyChoreBoard() {
               setViewSubmissionData(null);
             }
           }}
+          aria-label="View chore submission modal"
         />
       )}
 
@@ -141,8 +169,9 @@ export default function FamilyChoreBoard() {
           onCancel={closeConfirmModal}
           confirmText="Yes"
           cancelText="Cancel"
+          aria-label="Confirmation modal"
         />
       )}
-    </div>
+    </main>
   );
 }

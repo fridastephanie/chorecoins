@@ -20,6 +20,8 @@ import { FamilyProvider } from "../../shared/context/FamilyContext";
 import "../../css/features/familyChoreBoard.css";
 import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
 
+import familyImage from "../../assets/family_outside.png";
+
 export default function FamilyChoreBoard() {
   useDocumentTitle("Family Chore Board");  
   const { id: familyId } = useParams();
@@ -150,30 +152,38 @@ export default function FamilyChoreBoard() {
         </FamilyProvider>
       )}
 
-      {/* Filter chores by child */}
-      <ChoreFilter
-        childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
-        filterChildId={filterChildId}
-        setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
+        <img
+        src={familyImage}
+        alt="Family Doing Chores"
+        className="family-image"
       />
 
-      {/* Chore columns by status */}
-      <div className="choreboard-wrapper">
-        <div className="family-choreboard-columns">
-          {columns.map((col) => (
-            <ChoreColumn
-              key={col.status}
-              column={col}
-              chores={filteredChores.filter((c) => c.status === col.status)}
-              currentUser={currentUser}
-              onSubmit={(chore) => setSubmissionModalData(chore)}
-              onViewHistory={(chore) => setHistoryModalData(chore)}
-              onDeleteChore={handleDeleteChoreLocal}
-              onViewSubmission={(data) => setViewSubmissionData(data)}
-            />
-          ))}
-        </div>
-      </div>  
+      <div className="family-main-right">
+        {/* Filter chores by child */}
+        <ChoreFilter
+            childrenList={family?.members?.filter((m) => m.role === "CHILD") || []}
+            filterChildId={filterChildId}
+            setFilterChildId={(val) => setFilterChildId(val ? Number(val) : null)}
+        />
+
+        {/* Chore columns by status */}
+        <div className="choreboard-wrapper">
+            <div className="family-choreboard-columns">
+            {columns.map((col) => (
+                <ChoreColumn
+                key={col.status}
+                column={col}
+                chores={filteredChores.filter((c) => c.status === col.status)}
+                currentUser={currentUser}
+                onSubmit={(chore) => setSubmissionModalData(chore)}
+                onViewHistory={(chore) => setHistoryModalData(chore)}
+                onDeleteChore={handleDeleteChoreLocal}
+                onViewSubmission={(data) => setViewSubmissionData(data)}
+                />
+            ))}
+            </div>
+        </div>  
+      </div>
 
       {/* Modals */}
       {newChoreModalOpen && (

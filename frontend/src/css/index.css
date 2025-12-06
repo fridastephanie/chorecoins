@@ -6,7 +6,7 @@
   --white: #faefdf;
   --bg: #f8da95;
 
-  --radius: 18px;
+  --radius: 30px;
   --shadow: 2px 3px 2px rgba(0, 0, 0, 0.219);
 }
 
@@ -15,7 +15,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  max-width: 100%;
 }
 
 html, body {
@@ -36,7 +35,6 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 /* H1 */

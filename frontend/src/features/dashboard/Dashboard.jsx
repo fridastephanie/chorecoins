@@ -5,8 +5,6 @@ import ErrorBanner from "../../shared/components/ErrorBanner";
 import "../../css/features/dashboard.css";
 import boygirlChoreImage from "../../assets/girl_boy_laundry.png";
 import useDocumentTitle from "../../shared/hooks/useDocumentTitle";
-
-// Importera context
 import { FamilyProvider, useFamiliesContext } from "../../shared/context/FamilyContext";
 
 export default function Dashboard() {
@@ -22,7 +20,6 @@ export default function Dashboard() {
   }, []);
 
   return (
-    // Wrap hela Dashboard i FamilyProvider
     <FamilyProvider userId={user?.id}>
       <DashboardContent user={user} />
     </FamilyProvider>
@@ -30,7 +27,7 @@ export default function Dashboard() {
 }
 
 function DashboardContent({ user }) {
-  const { families, error, addFamily } = useFamiliesContext(); // använd context
+  const { families, error, addFamily } = useFamiliesContext(); 
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -59,7 +56,7 @@ function DashboardContent({ user }) {
           {showModal && (
             <NewFamilyModal
               onClose={() => setShowModal(false)}
-              onFamilyCreated={addFamily} // uppdaterar context
+              onFamilyCreated={addFamily} 
             />
           )}
         </>

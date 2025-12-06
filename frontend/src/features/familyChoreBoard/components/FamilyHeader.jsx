@@ -61,7 +61,7 @@ export default function FamilyHeader({
                 <div className="stats">
                   <div>
                     <span className="label">Completed Chores:</span>{" "}
-                    {currentWeekStat.completedChoresCount || 0}
+                    {(currentWeekStat.completedChoresCount || 0) + ", "}
                   </div>
                   <div>
                     <span className="label">Earned Coins:</span>{" "}

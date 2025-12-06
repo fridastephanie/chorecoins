@@ -1,8 +1,6 @@
-.family-choreboard {
-  width: 100%;        
-  max-width: 1200px;  
-  margin: 0 auto;      
-  padding: 0.5rem;       
+.family-choreboard {    
+  max-width: 1300px;  
+  margin: 0 auto;     
 }
 
 .family-choreboard > .family-header {
@@ -15,22 +13,21 @@
 
 .family-header h1 {
   font-size: 2rem;
-  margin-bottom: 0.5rem;
   color: var(--brown);
+  margin-bottom: 0.2rem;
 }
 
 .family-wrapper {
   border-radius: var(--radius);
-  border: 2px solid var(--brown);
-  box-shadow: var(--shadow);
-  padding: 1.5rem;
-  width: 100%;          
-  max-width: 1100px;   
+  padding: 1rem;
+  max-width: 1300px;
+  width: 100%;  
+  align-items: stretch;
   margin: 0 auto;
 }
 
 .family-wrapper h1 {
-  margin-bottom: 0.5rem; 
+  margin-bottom: 0rem; 
 }
 
 .family-info {
@@ -38,7 +35,6 @@
   flex-direction: column;
   gap: 2rem;
   width: 100%;
-  align-items: center;
 }
 
 .parents-section > strong,
@@ -55,6 +51,7 @@
 
 .children-section {
   padding-top: 0.7rem;
+  padding-bottom: 0.5rem;
 }
 
 .member-cards {
@@ -63,6 +60,8 @@
   justify-content: center;
   gap: 1rem;
   margin-top: 0.5rem;
+  width: 100%;
+  
 }
 
 .member-card {
@@ -70,12 +69,13 @@
   border: 2px solid var(--brown);
   border-radius: var(--radius);
   padding: 1rem;
-  width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center; 
   gap: 0.5rem;
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 325px;
 }
 
 .child-card .stats {
@@ -84,6 +84,7 @@
   justify-content: center;
   align-items: center;
   gap: 0.3rem;
+  width: 100%;
 }
 
 .child-card .stats > div {
@@ -156,11 +157,17 @@
   color: var(--brown);
 }
 
+
+.family-image {
+  display: block;   
+  margin: 1rem auto;
+  width: 350px;
+  height: auto;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+
 .choreboard-wrapper {
-  border-radius: var(--radius);
-  border: 2px solid var(--brown);
-  box-shadow: var(--shadow);
-  padding: 2rem;
+  padding: 1.6rem;
   margin-top: 1.5rem;
 }
 
@@ -180,10 +187,10 @@
 
 .chore-column > h2 {
   text-align: center; 
-  margin-top: 0.6rem;
 }
 
 .chore-card {
+  flex: 1;
   text-align: center; 
   background-color: var(--white);
   border: 2px solid var(--brown);
@@ -257,6 +264,16 @@
   .family-actions button {
     width: auto;
     min-width: 120px;
+  }
+
+  .parents-section .member-cards,
+  .children-section .member-cards {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+   .family-image {
+    width: 500px;
   }
 }
 

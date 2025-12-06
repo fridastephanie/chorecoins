@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT c FROM Child c LEFT JOIN FETCH c.families")
     List<Child> findAllChildrenWithFamilies();
 
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.families WHERE u.id = :id")
+    Optional<User> findByIdWithFamilies(Long id);
 }

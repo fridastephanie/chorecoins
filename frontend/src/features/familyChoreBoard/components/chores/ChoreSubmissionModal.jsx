@@ -1,26 +1,36 @@
 import React, { useState } from "react";
-import { useChoreApi } from "../../../../shared/hooks/useApi/useChoreApi";
 import Modal from "../../../../shared/components/Modal";
+import { useChoreApi } from "../../../../shared/hooks/useApi/useChoreApi";
+import { useFileUpload } from "../../hooks/chore/useFileUpload";
+import { ImagePreviewGrid } from "./ImagePreviewGrid";
+import { resizeImageFile } from "../../../../shared/utils/imageUtils";
 
 export default function ChoreSubmissionModal({ chore, onClose, onSubmit }) {
   const { handleSubmitChoreAndReturnChore } = useChoreApi();
   const [comment, setComment] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  const { files, previewUrls, error, handleFileChange, reset } = useFileUpload();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
-        const updatedChore = await handleSubmitChoreAndReturnChore(chore.id, {
+      const resizedFiles = await Promise.all(files.map(file => resizeImageFile(file)));
+
+      const updatedChore = await handleSubmitChoreAndReturnChore(chore.id, {
         commentChild: comment || null,
-        imageUrls: imageUrl ? [imageUrl] : [],
-        });
-        onSubmit(updatedChore);
-        onClose();
+        files: resizedFiles,
+      });
+
+      onSubmit(updatedChore);
+      reset();
+      onClose();
     } catch (err) {
-        console.error(err.response?.data || err);
-        setError(err.response?.data?.message || "Failed to submit chore");
+      setError(err.response?.data?.message || "Failed to submit chore");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,12 +43,11 @@ export default function ChoreSubmissionModal({ chore, onClose, onSubmit }) {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <input
-          placeholder="Image URL (optional)"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-        />
-        <button type="submit">Submit</button>
+        <input type="file" accept=".jpeg,.jpg,.png,.webp" multiple onChange={handleFileChange} />
+        <ImagePreviewGrid urls={previewUrls} />
+        <button type="submit" disabled={loading}>
+          {loading ? "Submitting..." : "Submit"}
+        </button>
       </form>
     </Modal>
   );

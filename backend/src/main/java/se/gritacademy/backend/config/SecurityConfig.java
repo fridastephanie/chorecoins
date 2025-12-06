@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/uploads/image/**").permitAll()
 
                         // Parent-only (write operations)
                         .requestMatchers(HttpMethod.POST, "/api/families/**").hasRole("PARENT")

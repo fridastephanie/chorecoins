@@ -9,6 +9,7 @@ import {
   rejectChore,
   deleteChore,
 } from "../../api/chore";
+import { useUploadImage } from "./useUploadImage";
 
 /**
  * Custom hook for managing chores via the API.
@@ -18,6 +19,7 @@ import {
 export function useChoreApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { uploadFiles, loading: uploadLoading, error: uploadError } = useUploadImage();
 
   const createNewChore = useCallback(async (payload) => {
     setLoading(true);
@@ -75,48 +77,66 @@ export function useChoreApi() {
     }
   }, []);
 
-    const handleSubmitChoreAndReturnChore = useCallback(async (choreId, payload) => {
-    setLoading(true);
-    setError(null);
-    try {
-        const res = await submitChoreAndReturnChore(choreId, payload);
-        return res.data; 
-    } catch (err) {
+  const handleSubmitChoreAndReturnChore = useCallback(
+      async (choreId, { commentChild, files }) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+          let uploadedUrls = [];
+          if (files?.length > 0) {
+            uploadedUrls = await uploadFiles(files); 
+          }
+
+          const res = await submitChoreAndReturnChore(choreId, {
+            commentChild,
+            imageUrls: uploadedUrls,
+          });
+
+          return res.data;
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to submit chore");
+          throw err;
+        } finally {
+          setLoading(false);
+        }
+      },
+      [uploadFiles]
+    );
+
+  const approveChoreSubmission = useCallback(
+    async (choreId, submissionId, payload) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await approveChore(choreId, submissionId, payload);
+        return res.data;
+      } catch (err) {
         setError(err);
         throw err;
-    } finally {
+      } finally {
         setLoading(false);
-    }
-    }, []);
+      }
+    },
+    []
+  );
 
-
-  const approveChoreSubmission = useCallback(async (choreId, submissionId, payload) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await approveChore(choreId, submissionId, payload);
-      return res.data;
-    } catch (err) {
-      setError(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const rejectChoreSubmission = useCallback(async (choreId, submissionId, payload) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await rejectChore(choreId, submissionId, payload);
-      return res.data;
-    } catch (err) {
-      setError(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const rejectChoreSubmission = useCallback(
+    async (choreId, submissionId, payload) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await rejectChore(choreId, submissionId, payload);
+        return res.data;
+      } catch (err) {
+        setError(err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   const handleDeleteChore = useCallback(async (choreId) => {
     setLoading(true);

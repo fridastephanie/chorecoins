@@ -4,6 +4,9 @@ FROM eclipse-temurin:21-jdk-alpine
 # Set working directory inside the container
 WORKDIR /app
 
+# Install SSL certificates and bash
+RUN apk add --no-cache bash openssl ca-certificates
+
 # Copy Maven wrapper and pom.xml first (for caching)
 COPY mvnw .
 COPY .mvn .mvn
@@ -25,7 +28,8 @@ RUN ./mvnw package -DskipTests
 EXPOSE 8080
 
 # Run the Spring Boot application
-CMD ["java", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
+# Force Java to use IPv4 stack to connect to Supabase
+CMD ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "target/backend-0.0.1-SNAPSHOT.jar"]
 
 # All sensitive values 
 # (DB_URL, DB_USERNAME, DB_PASSWORD, JWT_SECRET,

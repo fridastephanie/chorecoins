@@ -39,6 +39,7 @@ function DashboardContent({ user }) {
         className="dashboard-image"
       />
 
+      <h3>Your Families</h3>  
       <FamilyList families={families} />
 
       {user?.role === "PARENT" && (

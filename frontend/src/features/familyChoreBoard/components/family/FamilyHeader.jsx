@@ -11,11 +11,11 @@ export default function FamilyHeader({ family, currentUser, onAddChore, onAddMem
 
   return (
     <header className="family-header">
-      <h1 aria-label={`Current week: ${currentWeek}`}>Week {currentWeek}</h1>      
+      <h2 className="h2-week" aria-label={`Current week: ${currentWeek}`}>Week {currentWeek}</h2>      
 
       <section className="family-wrapper" aria-label="Family information">
         <div className="family-info">
-          <h2>✨{family.familyName}’s Chore Board✨</h2>          
+          <h2 className="h2-family-name">✨{family.familyName}’s Chore Board✨</h2>          
           <ParentsSection parents={parents} currentUser={currentUser} onRemoveMember={onRemoveMember} />
           <ChildrenSection childrenStats={childrenStats} currentUser={currentUser} onRemoveMember={onRemoveMember} />
         </div>

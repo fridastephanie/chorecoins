@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useForm } from "../../../shared/hooks/useForm";
 import { validateFirstName, validateEmail, validatePassword, validateConfirmPassword } from "../../../shared/utils/validation";
 import { useUserApi } from "../../../shared/hooks/useApi/useUserApi";
+import { useAuth } from "../../../shared/context/AuthContext";
 
 const userCache = {}; //Simple in-memory cache for user data keyed by userId
 
 export function useEditUserForm(user, onDeleteSuccess) {
   const { fetchUser, updateUserData, deleteUserAccount, loading, error } = useUserApi();
+  const { updateUser } = useAuth();
   const { values, handleChange, setValues } = useForm({
     firstName: "",
     email: "",
@@ -86,10 +88,14 @@ export function useEditUserForm(user, onDeleteSuccess) {
     if (values.firstName && values.firstName !== originalValues.firstName) payload.firstName = values.firstName;
     if (values.email && values.email !== originalValues.email) payload.email = values.email;
     if (values.password) payload.password = values.password;
+
     if (Object.keys(payload).length === 0) return null;
 
     const updatedUser = await updateUserData(user.id, payload);
-    userCache[user.id] = updatedUser; // Update cache with latest values
+    // Update cache with latest values
+    userCache[user.id] = updatedUser; 
+    // Update AuthContext so navbar updates instantly
+    updateUser(updatedUser);
 
     // Update original values so future comparisons work correctly
     setOriginalValues({

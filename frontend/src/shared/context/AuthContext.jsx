@@ -23,12 +23,12 @@ export const AuthProvider = ({ children }) => {
     const response = await apiLoginUser(credentials);
     const data = response.data;
 
-    const userDto = data.user; 
+    const userDto = data.user;
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(userDto));
 
-    api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
     setUser(userDto);
     navigate("/dashboard");
@@ -36,9 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Logs out the current user.
-   * Calls the API to logout but clears local state regardless of API success.
-   * Removes token and user from localStorage and deletes the auth header.
-   * Updates user state and navigates to the login page.
+   * Clears local state and localStorage regardless of API success.
    */
   const logout = async () => {
     try {
@@ -49,16 +47,26 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    delete api.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common["Authorization"];
 
     setUser(null);
-    navigate("/login", { replace: true }); 
+    navigate("/login", { replace: true });
   };
 
   /**
-   * Keeps user state in sync with localStorage changes.
-   * Useful when multiple tabs are open and login/logout occurs elsewhere.
+   * Updates the current user in both React state and localStorage.
+   * Used when the user updates profile info (name, email, etc).
+   */
+  const updateUser = (updatedFields) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  /**
+   * Keeps user state in sync with localStorage changes (multi-tab support)
    */
   useEffect(() => {
     const handleStorage = () => {
@@ -71,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

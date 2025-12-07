@@ -28,7 +28,7 @@ export default function ViewSubmissionModal({ chore, submission, onClose, onDeci
       {error && <p className="error" role="alert">{error}</p>}
 
       <p><strong>Submitted at:</strong> {latestSubmission?.submittedAt ? new Date(latestSubmission.submittedAt).toLocaleString() : "Unknown"}</p>
-      <p><strong>Child's message:</strong> {latestSubmission?.commentChild || "No message"}</p>
+      <p><strong>Child's message:</strong> {latestSubmission?.commentChild || "-"}</p>
 
       <ImagePreviewGrid urls={latestSubmission?.imageUrls?.map(fn => imageUrlsMap[fn])} />
 

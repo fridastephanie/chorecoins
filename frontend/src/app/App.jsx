@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Landing from "../features/landing/Landing";
 import Register from "../features/auth/register/Register";
@@ -29,6 +29,9 @@ export default function App() {
         <Route path="/edit-user/:id" element={<EditUser />} />
         <Route path="/family-choreboard/:id" element={<FamilyChoreBoard />} />
       </Route>
+
+       {/* Redirect all other routes to the homepage */}
+       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

@@ -11,8 +11,9 @@ export default function ChoreActions({
   const isParent = currentUser.role === "PARENT";
 
   const hasSubmissions = chore.submissions?.length > 0;
+
   const latestSubmission = hasSubmissions
-    ? chore.submissions[chore.submissions.length - 1]
+    ? [...chore.submissions].sort((a, b) => a.id - b.id).pop()
     : null;
 
   return (

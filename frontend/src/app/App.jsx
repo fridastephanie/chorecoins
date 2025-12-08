@@ -6,6 +6,7 @@ import Login from "../features/auth/login/Login";
 import Dashboard from "../features/dashboard/Dashboard";
 import EditUser from "../features/editUser/EditUser";
 import FamilyChoreBoard from "../features/familyChoreBoard/FamilyChoreBoard";
+import { NotFoundPage } from "../features/notFoundPage/NotFoundPage";
 import LoggedInLayout from "../shared/components/LoggedInLayout";
 import ProtectedRoute from "../shared/routes/ProtectedRoute";
 
@@ -30,8 +31,8 @@ export default function App() {
         <Route path="/family-choreboard/:id" element={<FamilyChoreBoard />} />
       </Route>
 
-       {/* Redirect all other routes to the homepage */}
-       <Route path="*" element={<Navigate to="/" replace />} />
+       {/* Catch-all */}
+       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

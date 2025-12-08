@@ -15,7 +15,7 @@ export default function Landing() {
           className="landing-image"
         />      
         <AuthButtons />
-        <h1 className="landing-title">Welcome to ChoreCoins!</h1>
+        <h2 className="landing-title">Welcome to ChoreCoins!</h2>
       </header>
 
       <section className="landing-info" aria-labelledby="landing-info-title">

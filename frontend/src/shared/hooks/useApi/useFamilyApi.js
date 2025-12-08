@@ -7,6 +7,7 @@ import {
   deleteFamily,
   getFamily,
 } from "../../api/family";
+import { useError } from "../../context/ErrorContext";
 
 /**
  * Custom hook for managing families via the API.
@@ -17,6 +18,7 @@ import {
 export function useFamilyApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { showError } = useError();
 
   const createNewFamily = useCallback(async (payload) => {
     setLoading(true);
@@ -25,12 +27,14 @@ export function useFamilyApi() {
       const res = await createFamily(payload);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to create family";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchFamilyApi = useCallback(async (familyId) => {
     setLoading(true);
@@ -39,12 +43,17 @@ export function useFamilyApi() {
       const res = await getFamily(familyId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg =
+        err.response?.status === 404
+          ? "Family not found"
+          : "Failed to load family";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const addFamilyMemberApi = useCallback(async (familyId, userId) => {
     setLoading(true);
@@ -53,12 +62,14 @@ export function useFamilyApi() {
       const res = await addMember(familyId, userId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to add member";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const removeFamilyMemberApi = useCallback(async (familyId, userId) => {
     setLoading(true);
@@ -67,12 +78,14 @@ export function useFamilyApi() {
       const res = await removeMember(familyId, userId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to remove member";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const updateFamilyApi = useCallback(async (familyId, payload) => {
     setLoading(true);
@@ -81,12 +94,14 @@ export function useFamilyApi() {
       const res = await updateFamilyName(familyId, payload);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to update family";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const deleteFamilyApi = useCallback(async (familyId) => {
     setLoading(true);
@@ -94,12 +109,14 @@ export function useFamilyApi() {
     try {
       await deleteFamily(familyId);
     } catch (err) {
-      setError(err);
+      const msg = "Failed to delete family";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   return {
     loading,

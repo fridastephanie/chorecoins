@@ -10,6 +10,7 @@ import {
   deleteChore,
 } from "../../api/chore";
 import { useUploadImage } from "./useUploadImage";
+import { useError } from "../../context/ErrorContext";
 
 /**
  * Custom hook for managing chores via the API.
@@ -19,7 +20,8 @@ import { useUploadImage } from "./useUploadImage";
 export function useChoreApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { uploadFiles, loading: uploadLoading, error: uploadError } = useUploadImage();
+  const { uploadFiles } = useUploadImage();
+  const { showError } = useError();
 
   const createNewChore = useCallback(async (payload) => {
     setLoading(true);
@@ -28,12 +30,14 @@ export function useChoreApi() {
       const res = await createChore(payload);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to create chore";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchChoresForFamily = useCallback(async (familyId) => {
     setLoading(true);
@@ -42,12 +46,14 @@ export function useChoreApi() {
       const res = await getChoresForFamily(familyId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to load chores for family";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchChoresForChild = useCallback(async (childId) => {
     setLoading(true);
@@ -56,12 +62,14 @@ export function useChoreApi() {
       const res = await getChoresForChild(childId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to load chores for child";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchChoreById = useCallback(async (choreId) => {
     setLoading(true);
@@ -70,73 +78,72 @@ export function useChoreApi() {
       const res = await getChoreById(choreId);
       return res.data;
     } catch (err) {
-      setError(err);
+      const msg = "Failed to load chore";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
-  const handleSubmitChoreAndReturnChore = useCallback(
-      async (choreId, { commentChild, files }) => {
-        setLoading(true);
-        setError(null);
+  const handleSubmitChoreAndReturnChore = useCallback(async (choreId, { commentChild, files }) => {
+    setLoading(true);
+    setError(null);
 
-        try {
-          let uploadedUrls = [];
-          if (files?.length > 0) {
-            uploadedUrls = await uploadFiles(files); 
-          }
-
-          const res = await submitChoreAndReturnChore(choreId, {
-            commentChild,
-            imageUrls: uploadedUrls,
-          });
-
-          return res.data;
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to submit chore");
-          throw err;
-        } finally {
-          setLoading(false);
-        }
-      },
-      [uploadFiles]
-    );
-
-  const approveChoreSubmission = useCallback(
-    async (choreId, submissionId, payload) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await approveChore(choreId, submissionId, payload);
-        return res.data;
-      } catch (err) {
-        setError(err);
-        throw err;
-      } finally {
-        setLoading(false);
+    try {
+      let uploadedUrls = [];
+      if (files?.length > 0) {
+        uploadedUrls = await uploadFiles(files);
       }
-    },
-    []
-  );
 
-  const rejectChoreSubmission = useCallback(
-    async (choreId, submissionId, payload) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await rejectChore(choreId, submissionId, payload);
-        return res.data;
-      } catch (err) {
-        setError(err);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+      const res = await submitChoreAndReturnChore(choreId, {
+        commentChild,
+        imageUrls: uploadedUrls,
+      });
+
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to submit chore";
+      showError(msg);
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [uploadFiles, showError]);
+
+  const approveChoreSubmission = useCallback(async (choreId, submissionId, payload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await approveChore(choreId, submissionId, payload);
+      return res.data;
+    } catch (err) {
+      const msg = "Failed to approve submission";
+      showError(msg);
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [showError]);
+
+  const rejectChoreSubmission = useCallback(async (choreId, submissionId, payload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await rejectChore(choreId, submissionId, payload);
+      return res.data;
+    } catch (err) {
+      const msg = "Failed to reject submission";
+      showError(msg);
+      setError(msg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [showError]);
 
   const handleDeleteChore = useCallback(async (choreId) => {
     setLoading(true);
@@ -144,12 +151,14 @@ export function useChoreApi() {
     try {
       await deleteChore(choreId);
     } catch (err) {
-      setError(err);
+      const msg = "Failed to delete chore";
+      showError(msg);
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   return {
     loading,

@@ -2,7 +2,7 @@
  * Validates first name: must start with uppercase and contain only letters.
  */
 export const validateFirstName = (name) => {
-  const nameRegex = /^[A-Z][a-z]+$/;
+  const nameRegex = /^[A-Ö][a-ö]+$/;
   return [
     { text: "First letter uppercase, letters only", isValid: nameRegex.test(name) }
   ];
@@ -24,7 +24,7 @@ export const validateEmail = (email) => {
 export const validatePassword = (password) => {
   return [
     { text: "Min 6 characters", isValid: password.length >= 6 },
-    { text: "Include 1 uppercase letter", isValid: /[A-Z]/.test(password) },
+    { text: "Include 1 uppercase letter", isValid: /[A-Ö]/.test(password) },
     { text: "Include 1 number", isValid: /[0-9]/.test(password) }
   ];
 };

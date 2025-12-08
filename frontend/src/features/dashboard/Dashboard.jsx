@@ -30,21 +30,23 @@ function DashboardContent({ user }) {
   const { families, error, addFamily } = useFamiliesContext(); 
 
   return (
-    <div className="dashboard-container">
+    <main className="dashboard-container" aria-labelledby="dashboard-heading">
       <ErrorBanner message={error} />
-      <h2>Dashboard</h2>
+      <h2 id="dashboard-heading">Dashboard</h2>
       <img
         src={boygirlChoreImage}
         alt="Illustration of a girl and boy doing laundry"
         className="dashboard-image"
       />
 
-      <h3>Your Families</h3>  
-      <FamilyList families={families} />
+      <section aria-labelledby="families-heading">
+        <h3 id="families-heading">Your Families</h3>
+        <FamilyList families={families} />
+      </section>
 
       {user?.role === "PARENT" && (
         <NewFamilyButton onFamilyCreated={addFamily} />
       )}
-    </div>
+    </main>
   );
 }

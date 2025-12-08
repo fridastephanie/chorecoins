@@ -7,15 +7,15 @@ import HomeLink from "../../../shared/components/HomeLink";
 export default function Register() {
   useDocumentTitle("Register");
   return (
-    <div className="register-container">
+    <main className="register-container" aria-labelledby="register-heading">
       <img 
         src={boyVacuumImage} 
         alt="Illustration of a boy vacuuming" 
         className="register-image" 
       />
-      <h2 className="register-title">Register</h2>
+      <h2 className="register-title" id="register-heading">Register</h2>
       <RegisterForm />
       <HomeLink />
-    </div>
+    </main>
   );
 }

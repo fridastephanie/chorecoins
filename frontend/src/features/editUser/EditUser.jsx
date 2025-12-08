@@ -5,9 +5,9 @@ import "../../css/features/editUser.css";
 export default function EditUser() {
   useDocumentTitle("Edit User");
   return (
-    <div className="edit-user-container">
-      <h2>Edit User</h2>
+    <main className="edit-user-container" aria-labelledby="edit-user-heading">
+      <h2 id="edit-user-heading">Edit User</h2>
       <EditUserForm />
-    </div>
+    </main>
   );
 }

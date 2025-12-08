@@ -10,7 +10,7 @@ import se.gritacademy.backend.dto.user.RegisterUserRequestDto;
 import se.gritacademy.backend.dto.user.UpdateUserRequestDto;
 import se.gritacademy.backend.dto.user.UserDto;
 import se.gritacademy.backend.entity.user.User;
-import se.gritacademy.backend.service.UserService;
+import se.gritacademy.backend.service.api.UserService;
 
 import java.util.List;
 

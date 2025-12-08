@@ -10,7 +10,7 @@ import se.gritacademy.backend.dto.chore.*;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.entity.user.Parent;
 import se.gritacademy.backend.entity.user.User;
-import se.gritacademy.backend.service.ChoreService;
+import se.gritacademy.backend.service.api.ChoreService;
 import java.util.List;
 
 @RestController

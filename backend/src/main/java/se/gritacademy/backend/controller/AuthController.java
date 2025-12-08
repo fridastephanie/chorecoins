@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import se.gritacademy.backend.dto.auth.LoginRequestDto;
 import se.gritacademy.backend.dto.auth.LoginResponseDto;
-import se.gritacademy.backend.service.AuthService;
+import se.gritacademy.backend.service.api.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")

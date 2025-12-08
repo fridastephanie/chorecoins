@@ -3,7 +3,7 @@ package se.gritacademy.backend.scheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import se.gritacademy.backend.service.WeeklyApprovedChoreCleanupService;
+import se.gritacademy.backend.service.scheduler.WeeklyApprovedChoreCleanupService;
 
 @Service
 @RequiredArgsConstructor

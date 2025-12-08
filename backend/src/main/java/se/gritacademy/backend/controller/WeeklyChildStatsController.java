@@ -7,7 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import se.gritacademy.backend.dto.weeklychildstats.*;
 import se.gritacademy.backend.entity.user.User;
-import se.gritacademy.backend.service.WeeklyChildStatsService;
+import se.gritacademy.backend.service.shared.WeeklyChildStatsService;
 
 import java.util.List;
 

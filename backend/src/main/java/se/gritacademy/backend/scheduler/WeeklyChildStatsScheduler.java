@@ -7,7 +7,7 @@ import se.gritacademy.backend.dto.weeklychildstats.CreateWeeklyChildStatsRequest
 import se.gritacademy.backend.entity.family.Family;
 import se.gritacademy.backend.entity.user.Child;
 import se.gritacademy.backend.repository.UserRepository;
-import se.gritacademy.backend.service.WeeklyChildStatsService;
+import se.gritacademy.backend.service.shared.WeeklyChildStatsService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

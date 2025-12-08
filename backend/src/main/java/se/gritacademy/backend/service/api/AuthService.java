@@ -1,4 +1,4 @@
-package se.gritacademy.backend.service;
+package se.gritacademy.backend.service.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +12,7 @@ import se.gritacademy.backend.dto.user.UserRole;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.helper.UserHelper;
 import se.gritacademy.backend.mapper.UserMapper;
+import se.gritacademy.backend.service.security.TokenBlacklistService;
 
 @Service
 @RequiredArgsConstructor

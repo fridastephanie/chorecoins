@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import se.gritacademy.backend.entity.user.User;
 import se.gritacademy.backend.repository.UserRepository;
-import se.gritacademy.backend.service.TokenBlacklistService;
+import se.gritacademy.backend.service.security.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

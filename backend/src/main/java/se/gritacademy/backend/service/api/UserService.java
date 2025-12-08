@@ -1,4 +1,4 @@
-package se.gritacademy.backend.service;
+package se.gritacademy.backend.service.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

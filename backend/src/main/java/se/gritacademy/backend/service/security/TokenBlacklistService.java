@@ -1,4 +1,4 @@
-package se.gritacademy.backend.service;
+package se.gritacademy.backend.service.security;
 
 import org.springframework.stereotype.Service;
 

@@ -14,7 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import se.gritacademy.backend.repository.UserRepository;
-import se.gritacademy.backend.service.TokenBlacklistService;
+import se.gritacademy.backend.service.security.TokenBlacklistService;
 
 import java.util.List;
 

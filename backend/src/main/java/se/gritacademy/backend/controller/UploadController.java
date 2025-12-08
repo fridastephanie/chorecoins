@@ -9,7 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import se.gritacademy.backend.entity.user.User;
-import se.gritacademy.backend.service.UploadService;
+import se.gritacademy.backend.service.api.UploadService;
 
 @RestController
 @RequestMapping("/api/uploads")

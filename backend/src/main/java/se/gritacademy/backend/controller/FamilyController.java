@@ -10,7 +10,7 @@ import se.gritacademy.backend.dto.family.CreateFamilyRequestDto;
 import se.gritacademy.backend.dto.family.FamilyDto;
 import se.gritacademy.backend.entity.user.Parent;
 import se.gritacademy.backend.entity.user.User;
-import se.gritacademy.backend.service.FamilyService;
+import se.gritacademy.backend.service.api.FamilyService;
 
 @RestController
 @RequestMapping("/api/families")

@@ -48,6 +48,12 @@ It includes live form validation, role-based permissions, image uploads, weekly 
 - Comments hashed in database
 - Role-based access for images and actions
 
+### Accessibility
+- Proper semantic HTML elements used throughout the app
+- ARIA attributes added for improved screen reader support
+- All form fields and buttons properly labeled
+- Full keyboard navigation supported
+
 ## 📁 Project Structure
   
 ### Backend (Spring Boot)

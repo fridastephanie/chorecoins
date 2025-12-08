@@ -5,6 +5,10 @@ export default function ChildWeeklyStatsModal({ child, stats, onClose }) {
 
   const hasStats = stats && stats.length > 0;
 
+  const sortedStats = hasStats
+    ? [...stats].sort((a, b) => b.weekNumber - a.weekNumber)
+    : [];
+
   return (
     <Modal
       title={`${child.firstName} Weekly Stats`}
@@ -13,7 +17,7 @@ export default function ChildWeeklyStatsModal({ child, stats, onClose }) {
     >
       {hasStats ? (
         <ul className="child-stats-list">
-          {stats.map((week) => (
+          {sortedStats.map((week) => (
             <li key={week.id} className="child-stats-item">
               <div><strong>Week:</strong> {week.weekNumber}</div>
               <div><strong>Completed Chores:</strong> {week.completedChoresCount}</div>

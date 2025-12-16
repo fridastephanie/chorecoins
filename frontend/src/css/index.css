@@ -96,6 +96,14 @@ input, select, textarea {
 
 select {
   min-height: 44px; 
+  height: 44px;
+  font-size: 16px;
+}
+
+input[type="date"] {
+  min-height: 44px; 
+  height: 44px;  
+  font-size: 16px; 
 }
 
 label {

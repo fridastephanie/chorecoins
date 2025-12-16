@@ -22,7 +22,7 @@ public class CreateChoreRequestDto {
     @PositiveOrZero(message = "Value must be zero or positive")
     private BigDecimal value;
 
-    @FutureOrPresent(message = "Due date must be today or in the future")
+    @NotNull
     private LocalDate dueDate;
 
     @NotNull(message = "familyId is required")

@@ -53,7 +53,8 @@ public class Chore {
     @JoinColumn(name = "family_id", nullable = false)
     private Family family;
 
-    @FutureOrPresent
+    @NotNull
+    @Column(nullable = false)
     private LocalDate dueDate;
 
     private Instant createdAt = Instant.now();

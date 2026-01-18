@@ -113,17 +113,31 @@ It includes live form validation, role-based permissions, image uploads, weekly 
 - Upload and process images securely in the frontend  
 - Implement role-based access and hash sensitive data  
 - Use scheduled backend tasks for weekly resets and chore cleanup  
-- Deepen Spring Boot and React skills  
+- Deepen Spring Boot and React skills
 
 ## 📌 Other
   
-- All images used in the app are generated entirely by ChatGPT, except for the background image, which is sourced from Freepik.
+- All images used in the app's UI were generated entirely by ChatGPT, except for the background image, which is sourced from Freepik.
 - This project was developed as my exam project, completed within a timeframe of total 90 hours.
+
+## 📸 Screenshots
+#### *Not logged in*
+<img src="https://github.com/user-attachments/assets/7f1eeb96-2b8c-4108-b214-f12b11115c3a" height="280" alt="Landing page">
+<img src="https://github.com/user-attachments/assets/54b7f767-5cc0-4efc-be1a-c322cf0a12bc" height="280" alt="Register page">
+<img src="https://github.com/user-attachments/assets/68a1abc0-31ca-4295-b70c-212be915f2fc" height="280" alt="Login page">
+
+#### *Logged in*
+<img src="https://github.com/user-attachments/assets/7351be05-a952-4516-83ce-78f7041d7b68" height="280" alt="Dashboard page">
+<img src="https://github.com/user-attachments/assets/0c08e763-5fdb-4b6b-9e42-25d272e423c8" height="280" alt="Edit User page">
+<img src="https://github.com/user-attachments/assets/40d10e73-c09a-4e18-883f-11ddba067237" height="280" alt="Choreboard page (Family Part)">
+<img src="https://github.com/user-attachments/assets/7cada5cb-6b49-4073-9217-c1f61cbb80be" height="280" alt="Choreboard page (Chore Part)">
+<img src="https://github.com/user-attachments/assets/7f0ff420-6c79-492b-8210-fd2f75ed7db3" height="280" alt="Choreboard page (Submit View)">
+<img src="https://github.com/user-attachments/assets/6d4607ab-8e9b-45cc-a18f-0da455a9b357" height="280" alt="Choreboard page (Rejected History View)">
+<img src="https://github.com/user-attachments/assets/5f4c171a-b7cd-4a68-b5b3-58fdb909b16b" height="280" alt="Choreboard page (Approved History View)">
 
 ## 🚀 Live Project
   
 This project uses environment variables for the database, storage, JWT, chor_encrypt, etc.
 Cloning this repository will not allow you to run it locally, as you would need to set up your own database, storage, and secrets.
 
-The project is live at: https://chorecoins.onrender.com - feel free to play around and explore the app!  
-⚠️ Note: Since this project is hosted on Render's free tier, the first load of each page may be a bit slow as the services "wake up".
+The project is live at: https://chorecoins.onrender.com - feel free to play around and explore the app!

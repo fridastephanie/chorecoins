@@ -141,3 +141,5 @@ This project uses environment variables for the database, storage, JWT, chor_enc
 Cloning this repository will not allow you to run it locally, as you would need to set up your own database, storage, and secrets.
 
 The project is live at: https://chorecoins.onrender.com - feel free to play around and explore the app!
+
+**Note:** This project uses Render's free tier. The first page load may be very slow due to cold starts, and scheduled tasks are only processed while the service is active.
